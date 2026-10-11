@@ -333,6 +333,7 @@ body{overscroll-behavior-y:contain}
   .subs{padding-left:30px}
   dialog{max-height:90vh;overflow-y:auto}
 }
+#syncBtn.on{border-color:var(--acc);color:var(--acc)}
 </style>
 </head>
 <body>
@@ -346,7 +347,7 @@ body{overscroll-behavior-y:contain}
     <button class="btn ghost" id="calBtn">📅 Lịch</button>
   </div>
   <div class="calpop" id="calPop" hidden></div>
-  <span class="row"><button class="btn ghost" id="layReset" style="display:none">Đặt lại bố cục</button><button class="btn ghost" id="layBtn">✥ Bố cục</button><button class="btn ghost" id="lang" title="Ngôn ngữ / Language">🌐 VI</button><button class="btn ghost" id="theme">⚙ Cài đặt</button></span>
+  <span class="row"><button class="btn ghost" id="layReset" style="display:none">Đặt lại bố cục</button><button class="btn ghost" id="layBtn">✥ Bố cục</button><button class="btn ghost" id="syncBtn" title="Đồng bộ giữa các thiết bị">☁ <span id="syLbl">Đồng bộ</span></button><button class="btn ghost" id="lang" title="Ngôn ngữ / Language">🌐 VI</button><button class="btn ghost" id="theme">⚙ Cài đặt</button></span>
 </header>
 <nav id="bnav"><button data-v="home" class="on"><b>🏠</b><span>Trang chủ</span></button><button data-v="vision"><b>🖼</b><span>Vision</span></button><button data-v="work"><b>📋</b><span>Kế hoạch</span></button><button data-bn="cal"><b>📅</b><span>Lịch</span></button><button data-bn="set"><b>⚙</b><span>Cài đặt</span></button></nav>
 <main id="vision" hidden><div class="card" id="vb">
@@ -459,6 +460,24 @@ body{overscroll-behavior-y:contain}
   <label>Ghi chú / địa điểm</label><input id="evN">
   <div class="row" style="margin-top:14px"><button class="btn del" id="evDel">Xoá</button><span class="grow"></span><button class="btn ghost" id="evCancel">Huỷ</button><button class="btn" id="evSave">Lưu</button></div>
 </dialog>
+<dialog id="syncdlg">
+  <h2 style="margin:0 0 8px">☁ Đồng bộ tài khoản</h2>
+  <div id="syOff" hidden class="mute">Chưa cấu hình Firebase. Hãy điền thông tin dự án vào file <b>firebase-config.js</b>.</div>
+  <div id="syIn">
+    <button class="btn" id="syGoogle" style="width:100%">Đăng nhập bằng Google</button>
+    <div class="mute" style="text-align:center;margin:10px 0">hoặc dùng email</div>
+    <label>Email</label><input id="syEm" type="email" autocomplete="email">
+    <label>Mật khẩu</label><input id="syPw" type="password" autocomplete="current-password">
+    <div class="row" style="margin-top:12px"><button class="btn" id="syLogin">Đăng nhập</button><button class="btn ghost" id="syReg">Tạo tài khoản</button><button class="btn ghost" id="syRst">Quên mật khẩu</button></div>
+  </div>
+  <div id="syOut" hidden>
+    <p style="margin:0 0 10px">Đang đăng nhập: <b id="syMail"></b></p>
+    <div class="row"><button class="btn" id="syNow">Đồng bộ ngay</button><button class="btn ghost" id="syLogout">Đăng xuất</button></div>
+  </div>
+  <p class="mute" id="syMsg" style="color:var(--danger)"></p>
+  <p class="mute" id="syncSt"></p>
+  <div class="row" style="margin-top:8px"><button class="btn ghost" id="syX">Đóng</button></div>
+</dialog>
 <dialog id="set">
   <h2 style="margin:0 0 8px">Cài đặt</h2>
   <div class="plab">Vision board</div>
@@ -497,11 +516,15 @@ body{overscroll-behavior-y:contain}
   <input type="range" id="fSize" min="13" max="19" step="1">
   <div class="row" style="margin-top:16px"><button class="btn ghost" id="thReset">Đặt lại mặc định</button><button class="btn" id="thX">Xong</button></div>
 </dialog>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 let S={todos:[],events:[],plan:{},goals:{},saved:[],pomo:{}};
 try{const r=localStorage.getItem('studyhub');if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
-const save=()=>{try{localStorage.setItem('studyhub',JSON.stringify(S))}catch(e){}};
+const save=()=>{if(window._stamp)_stamp();try{localStorage.setItem('studyhub',JSON.stringify(S))}catch(e){}if(window._sched)_sched()};
 const uid=()=>Math.random().toString(36).slice(2,9);
 const pad=n=>String(n).padStart(2,'0');
 const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
@@ -719,7 +742,7 @@ $('#goals').onkeydown=e=>{const a=e.target.dataset.madd,v=e.target.value.trim();
 // VISION
 const VG={'Cam':['#b5482f','#e8a06a'],'Xanh lá':['#3f6b5a','#9cc7b2'],'Xanh dương':['#3b6ea5','#9cc3ee'],'Tím':['#7a4f9b','#d3a9ee'],'Hồng':['#c2576b','#f3b3bf'],'Đen':['#23211e','#6b645a']};
 let VB=[],dragId=null;try{VB=JSON.parse(localStorage.getItem('studyhub_vb')||'[]')}catch(e){}
-function saveVB(){try{localStorage.setItem('studyhub_vb',JSON.stringify(VB));return true}catch(e){alert('Bộ nhớ trình duyệt đã đầy. Hãy xoá bớt ảnh rồi thử lại.');return false}}
+function saveVB(){try{localStorage.setItem('studyhub_vb',JSON.stringify(VB));if(window._schedVB)_schedVB();return true}catch(e){alert('Bộ nhớ trình duyệt đã đầy. Hãy xoá bớt ảnh rồi thử lại.');return false}}
 const vbBase=()=>S.vbSize||180;
 const tfs=(v,w)=>Math.round((v.t.length>60?15:v.t.length>25?19:25)*Math.min(2.2,Math.max(.75,w/180)));
 const vbRes='<i class="vbr" data-vr="1" title="Kéo để đổi cỡ · bấm đúp để về mặc định">◢</i>';
@@ -1115,8 +1138,8 @@ $('#sFile').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)retur
   if(f.size>1.2*1024*1024){alert('File quá lớn (tối đa khoảng 1,2MB vì chỉ lưu được trong trình duyệt). Hãy chọn đoạn âm thanh ngắn hơn.');return}
   const r=new FileReader();r.onload=()=>{const old=SC;SC={name:f.name,src:r.result};
     try{localStorage.setItem('studyhub_snd',JSON.stringify(SC))}catch(err){SC=old;alert('Bộ nhớ trình duyệt đã đầy. Hãy xoá bớt ảnh ở Vision board hoặc chọn file nhỏ hơn.');return}
-    S.snd.f='custom';save();sndUI();playSound('custom')};r.readAsDataURL(f)};
-$('#sDel').onclick=()=>{SC=null;try{localStorage.removeItem('studyhub_snd')}catch(e){}if(S.snd.f==='custom')S.snd.f='bell';if(S.snd.b==='custom')S.snd.b='chime';save();sndUI()};
+    S.snd.f='custom';save();sndUI();if(window._pushSnd)_pushSnd();playSound('custom')};r.readAsDataURL(f)};
+$('#sDel').onclick=()=>{SC=null;try{localStorage.removeItem('studyhub_snd')}catch(e){}if(S.snd.f==='custom')S.snd.f='bell';if(S.snd.b==='custom')S.snd.b='chime';save();sndUI();if(window._pushSnd)_pushSnd()};
 sndUI();
 
 // ===== 2 mục: Trang chủ (vision board) / Việc & kế hoạch =====
@@ -1208,6 +1231,121 @@ function setLang(l,first){S.lang=l;document.documentElement.lang=l;$('#lang').fi
   if(!first){save();tickClock();hmBuild&&hmBuild()}}
 $('#lang').onclick=()=>setLang(S.lang==='en'?'vi':'en');
 if(S.lang==='en')setLang('en',true);
+
+// ===== ĐỒNG BỘ ĐÁM MÂY (Firebase Auth + Firestore) =====
+(function(){
+const cfg=window.FIREBASE_CONFIG,ok=!!(window.firebase&&cfg&&cfg.apiKey&&cfg.projectId);
+const dlg=$('#syncdlg'),btn=$('#syncBtn');
+let user=null,db=null,auth=null,applying=false,lastJson='',pushT=null,vbT=null,vbMap=new Map(),unsubs=[],toast=null;
+const sUid='studyhub_sync_uid',kU='studyhub_snd_u';
+const hh=()=>{const d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes())};
+function setSt(t){$('#syncSt').textContent=t;$('#syLbl').textContent=user?'Đã đồng bộ':'Đồng bộ';btn.classList.toggle('on',!!user)}
+const errMsg=e=>({'auth/invalid-credential':'Sai email hoặc mật khẩu.','auth/wrong-password':'Sai mật khẩu.','auth/user-not-found':'Email chưa có tài khoản.','auth/email-already-in-use':'Email này đã có tài khoản, hãy bấm Đăng nhập.','auth/weak-password':'Mật khẩu cần ít nhất 6 ký tự.','auth/invalid-email':'Email không hợp lệ.','auth/popup-closed-by-user':'Bạn đã đóng cửa sổ đăng nhập.','auth/unauthorized-domain':'Tên miền này chưa được thêm vào Authorized domains trong Firebase.','auth/network-request-failed':'Không có mạng.','auth/too-many-requests':'Thử quá nhiều lần, hãy đợi một lúc.'}[e.code]||('Lỗi: '+(e.code||e.message)));
+const msg=t=>{$('#syMsg').textContent=t||''};
+const clean=()=>{const c=Object.assign({},S);delete c._u;return JSON.stringify(c)};
+const lsSave=()=>{try{localStorage.setItem('studyhub',JSON.stringify(S))}catch(e){}};
+lastJson=clean();
+
+// gắn vào save(): chỉ đánh dấu "mới sửa" khi nội dung thật sự đổi
+window._stamp=()=>{if(applying)return;const j=clean();if(j!==lastJson){lastJson=j;S._u=Date.now()}};
+window._sched=()=>{if(!user||applying)return;clearTimeout(pushT);pushT=setTimeout(()=>{pushT=null;pushMain()},1500)};
+window._schedVB=(d)=>schedVB(d);
+window._pushSnd=()=>pushSnd();
+
+const P=s=>`users/${user.uid}/${s}`;
+async function pushMain(){if(!user)return;try{setSt('Đang đồng bộ…');if(!S._u){S._u=Date.now();lastJson=clean();lsSave()}
+  await db.doc(P('sync/main')).set({json:JSON.stringify(S),u:S._u});setSt('Đã đồng bộ ✓ '+hh())}catch(e){setSt('Lỗi đồng bộ: '+(e.code||e.message))}}
+
+function schedVB(delay){if(!user)return;clearTimeout(vbT);vbT=setTimeout(async()=>{vbT=null;
+  try{setSt('Đang đồng bộ…');const ops=[],seen=new Set();
+    VB.forEach((v,i)=>{seen.add(v.id);const j=JSON.stringify(v),sig=j+'|'+i;if(vbMap.get(v.id)!==sig){ops.push(['s',v.id,{json:j,o:i}]);vbMap.set(v.id,sig)}});
+    [...vbMap.keys()].forEach(id=>{if(!seen.has(id)){ops.push(['d',id]);vbMap.delete(id)}});
+    for(let i=0;i<ops.length;i+=15){const b=db.batch();ops.slice(i,i+15).forEach(o=>{const r=db.doc(P('vb/'+o[1]));o[0]==='s'?b.set(r,o[2]):b.delete(r)});await b.commit()}
+    setSt('Đã đồng bộ ✓ '+hh())}catch(e){setSt('Lỗi đồng bộ: '+(e.code||e.message))}},delay===undefined?1200:delay)}
+
+async function pushSnd(){if(!user)return;const u=Date.now();
+  try{localStorage.setItem(kU,u);const col=db.collection(P('snd'));const old=await col.get();
+    if(!old.empty){const b=db.batch();old.forEach(d=>b.delete(d.ref));await b.commit()}
+    if(SC){const s=JSON.stringify(SC),parts=[];for(let i=0;i<s.length;i+=450000)parts.push(s.slice(i,i+450000));
+      for(let i=0;i<parts.length;i++)await col.doc(String(i).padStart(3,'0')).set({s:parts[i]});
+      await db.doc(P('sync/snd')).set({n:parts.length,u})}
+    else await db.doc(P('sync/snd')).set({n:0,u})}catch(e){}}
+async function pullSnd(d){try{let s=null;
+  if(d.n>0){const q=await db.collection(P('snd')).get(),a=[];q.forEach(x=>a.push([x.id,x.data().s]));a.sort((x,y)=>x[0]<y[0]?-1:1);
+    if(a.length<d.n)return;s=a.map(x=>x[1]).join('')}
+  SC=s?JSON.parse(s):null;
+  try{if(SC)localStorage.setItem('studyhub_snd',s);else localStorage.removeItem('studyhub_snd')}catch(e){}
+  localStorage.setItem(kU,d.u);sndUI()}catch(e){}}
+
+function showToast(){if(!toast){toast=document.createElement('div');
+  toast.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:99;background:var(--card);color:var(--ink);border:1px solid var(--acc);border-radius:12px;padding:10px 14px;box-shadow:0 4px 18px #0004;display:flex;gap:10px;align-items:center';
+  toast.innerHTML='<span>Có dữ liệu mới từ thiết bị khác.</span><button class="btn" id="syReload">Tải lại</button>';document.body.appendChild(toast);$('#syReload').onclick=()=>location.reload()}toast.hidden=false}
+const busy=()=>run||(document.activeElement&&/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)&&!dlg.open)||document.querySelector('dialog[open]');
+function applyMain(d){clearTimeout(pushT);pushT=null;applying=true;
+  try{const r=JSON.parse(d.json);r._u=d.u;Object.keys(S).forEach(k=>delete S[k]);Object.assign(S,r);lsSave();lastJson=clean()}catch(e){applying=false;return}
+  applying=false;setSt('Đã đồng bộ ✓ '+hh());
+  if(busy())showToast();else location.reload()}
+
+const hasLocal=()=>S.todos.length||S.events.length||VB.length||Object.keys(S.plan||{}).length||Object.keys(S.goals||{}).length;
+async function link(u){
+  if(localStorage.getItem(sUid)===u.uid)return;
+  setSt('Đang kiểm tra dữ liệu…');
+  const [m,vs]=await Promise.all([db.doc(P('sync/main')).get(),db.collection(P('vb')).get()]);
+  vbMap=new Map();const cv=[];vs.forEach(d=>{const x=d.data();cv.push([x.o,JSON.parse(x.json)]);vbMap.set(d.id,x.json+'|'+x.o)});
+  let useCloud=m.exists;
+  if(m.exists&&hasLocal())useCloud=confirm('Tài khoản này đã có dữ liệu trên đám mây.\n\nOK = dùng dữ liệu trên đám mây (dữ liệu trên máy này được lưu một bản sao lưu).\nHuỷ = giữ dữ liệu trên máy này và ghi đè lên đám mây.');
+  if(useCloud){
+    try{localStorage.setItem('studyhub_prebackup',JSON.stringify(S))}catch(e){}
+    cv.sort((a,b)=>a[0]-b[0]);try{localStorage.setItem('studyhub_vb',JSON.stringify(cv.map(a=>a[1])))}catch(e){}
+    localStorage.setItem(sUid,u.uid);applyMain(m.data());return 'reload'}
+  // dùng dữ liệu máy này → đưa lên đám mây
+  S._u=Date.now();lastJson=clean();lsSave();await pushMain();schedVB(0);if(SC)pushSnd();
+  localStorage.setItem(sUid,u.uid)}
+
+function listen(){
+  unsubs.push(db.doc(P('sync/main')).onSnapshot(s=>{
+    if(s.metadata.hasPendingWrites)return;if(!s.exists){if(!s.metadata.fromCache&&S._u)pushMain();return}
+    const d=s.data(),ru=d.u||0,lu=S._u||0;
+    if(ru>lu)applyMain(d);else if(lu>ru)pushMain();else setSt('Đã đồng bộ ✓ '+hh())},e=>setSt('Lỗi: '+(e.code||e.message))));
+  unsubs.push(db.collection(P('vb')).onSnapshot(s=>{
+    if(s.metadata.hasPendingWrites||(s.empty&&s.metadata.fromCache))return;
+    const arr=[],mp=new Map();s.forEach(d=>{const x=d.data();arr.push([x.o,JSON.parse(x.json)]);mp.set(d.id,x.json+'|'+x.o)});
+    if(vbT)return;vbMap=mp;arr.sort((a,b)=>a[0]-b[0]);const nv=arr.map(a=>a[1]);
+    if(JSON.stringify(nv)===JSON.stringify(VB))return;
+    VB=nv;try{localStorage.setItem('studyhub_vb',JSON.stringify(VB))}catch(e){}rVB();hmBuild()}));
+  unsubs.push(db.doc(P('sync/snd')).onSnapshot(s=>{
+    if(s.metadata.hasPendingWrites||!s.exists)return;const d=s.data();if((d.u||0)>(+localStorage.getItem(kU)||0))pullSnd(d)}));
+}
+
+function ui(){$('#syIn').hidden=!!user||!ok;$('#syOut').hidden=!user;$('#syOff').hidden=ok;$('#syMail').textContent=user?(user.email||user.displayName||''):''}
+btn.onclick=()=>{msg('');ui();dlg.showModal()};
+$('#syX').onclick=()=>dlg.close();
+if(!ok){ui();setSt('Chưa cấu hình');if(cfg&&cfg.apiKey&&!window.firebase)$('#syOff').textContent='Không tải được thư viện Firebase. Hãy kiểm tra mạng và mở app qua https.';window._stamp=null;window._sched=null;return}
+
+try{
+firebase.initializeApp(cfg);auth=firebase.auth();db=firebase.firestore();
+try{db.enablePersistence({synchronizeTabs:true}).catch(()=>{})}catch(e){}
+$('#syGoogle').onclick=async()=>{msg('');const p=new firebase.auth.GoogleAuthProvider();
+  try{await auth.signInWithPopup(p)}catch(e){if(/popup-blocked|operation-not-supported|web-storage-unsupported/.test(e.code||''))auth.signInWithRedirect(p);else msg(errMsg(e))}};
+auth.getRedirectResult().catch(e=>msg(errMsg(e)));
+const cred=()=>[$('#syEm').value.trim(),$('#syPw').value];
+$('#syLogin').onclick=()=>{msg('');auth.signInWithEmailAndPassword(...cred()).catch(e=>msg(errMsg(e)))};
+$('#syReg').onclick=()=>{msg('');auth.createUserWithEmailAndPassword(...cred()).catch(e=>msg(errMsg(e)))};
+$('#syPw').onkeydown=e=>{if(e.key==='Enter')$('#syLogin').click()};
+$('#syRst').onclick=()=>{const em=$('#syEm').value.trim();if(!em){msg('Nhập email trước rồi bấm lại.');return}auth.sendPasswordResetEmail(em).then(()=>msg('Đã gửi email đặt lại mật khẩu.')).catch(e=>msg(errMsg(e)))};
+$('#syNow').onclick=async()=>{S._u=Date.now();lsSave();lastJson=clean();await pushMain();schedVB(0);if(SC)pushSnd()};
+$('#syLogout').onclick=()=>auth.signOut();
+auth.onAuthStateChanged(async u=>{
+  unsubs.forEach(f=>f());unsubs=[];user=u;ui();
+  if(!u){setSt('Chưa đăng nhập');return}
+  try{if(await link(u)==='reload')return}catch(e){setSt('Lỗi: '+(e.code||e.message));return}
+  listen();dlg.open&&dlg.close();setSt('Đã đồng bộ ✓ '+hh())});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden||!user)return;if(pushT){clearTimeout(pushT);pushT=null;pushMain()}if(vbT)schedVB(0)});
+addEventListener('offline',()=>user&&setSt('Ngoại tuyến — sẽ đồng bộ khi có mạng'));
+addEventListener('online',()=>user&&setSt('Đã có mạng, đang đồng bộ…'));
+}catch(e){console.error('sync init',e);setSt('Lỗi khởi tạo đồng bộ: '+(e.code||e.message));$('#syOff').hidden=false;$('#syOff').textContent='Không khởi tạo được Firebase: '+(e.message||e)+'. Hãy mở app qua https (không mở trực tiếp file).'}
+try{[['Đồng bộ','Sync'],['Đã đồng bộ','Synced'],['☁ Đồng bộ tài khoản','☁ Account sync'],['Đăng nhập bằng Google','Sign in with Google'],['hoặc dùng email','or use email'],['Mật khẩu','Password'],['Đăng nhập','Sign in'],['Tạo tài khoản','Create account'],['Quên mật khẩu','Forgot password'],['Đồng bộ ngay','Sync now'],['Đăng xuất','Sign out'],['Đóng','Close'],['Đang đăng nhập:','Signed in as:']].forEach(([a,b])=>LD.set(a,b))}catch(e){}
+})();
 </script>
 </body>
 </html>
