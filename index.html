@@ -334,6 +334,26 @@ body{overscroll-behavior-y:contain}
   dialog{max-height:90vh;overflow-y:auto}
 }
 #syncBtn.on{border-color:var(--acc);color:var(--acc)}
+textarea.tx{resize:none;overflow:hidden;display:block;width:auto;font-size:14px;line-height:1.4;white-space:pre-wrap;overflow-wrap:anywhere;color:inherit}
+.sub textarea.tx{font-size:13px}
+#tList .todo{align-items:flex-start}
+#tList .todo>input[type=checkbox]{margin-top:4px}
+#tList .todo>span{line-height:1.4;padding-top:2px;overflow-wrap:anywhere}
+.ta{display:flex;align-items:center;gap:2px;flex:none}
+#tList .sub{align-items:flex-start}
+#tList .sub>input[type=checkbox]{margin-top:3px}
+.vbfab{display:none}
+.vbhint{display:none}
+@media(pointer:coarse){.vbhint{display:block}}
+@media(max-width:700px){
+  #tList .todo{flex-wrap:wrap;row-gap:2px}
+  #tList .todo>.tx,#tList .todo>span{flex:1 1 calc(100% - 36px);min-width:0}
+  #tList .todo>.ta{margin-left:auto}
+  textarea.tx{font-size:16px}
+  body[data-view=vision] .vbfab{display:grid;position:fixed;right:16px;bottom:calc(78px + env(safe-area-inset-bottom,0px));width:56px;height:56px;border-radius:50%;background:var(--acc);color:#fff;font-size:30px;line-height:1;place-items:center;box-shadow:0 6px 18px #0006;z-index:2400;cursor:pointer}
+  #vbBar .btn{flex:1 1 0;text-align:center;padding:8px 6px;white-space:nowrap}
+  #vbMake{flex-wrap:wrap}#vbMake .grow{flex:1 1 100%}
+}
 #pcBox .pr{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 8px}
 #pcBox button{min-width:40px;padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);cursor:pointer;font:inherit}
 #pcBox button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
@@ -354,7 +374,10 @@ body{overscroll-behavior-y:contain}
   <span class="row"><button class="btn ghost" id="layReset" style="display:none">Đặt lại bố cục</button><button class="btn ghost" id="layBtn">✥ Bố cục</button><button class="btn ghost" id="syncBtn" title="Đồng bộ giữa các thiết bị">☁ <span id="syLbl">Đồng bộ</span></button><button class="btn ghost" id="lang" title="Ngôn ngữ / Language">🌐 VI</button><button class="btn ghost" id="theme">⚙ Cài đặt</button></span>
 </header>
 <nav id="bnav"><button data-v="home" class="on"><b>🏠</b><span>Trang chủ</span></button><button data-v="vision"><b>🖼</b><span>Vision</span></button><button data-v="work"><b>📋</b><span>Kế hoạch</span></button><button data-bn="cal"><b>📅</b><span>Lịch</span></button><button data-bn="set"><b>⚙</b><span>Cài đặt</span></button></nav>
+<label class="vbfab" id="vbFab" title="Thêm ảnh">＋<input type="file" id="vbFile3" accept="image/*" multiple hidden></label>
 <main id="vision" hidden><div class="card" id="vb">
+  <div class="row vbbar" id="vbBar" style="margin-bottom:10px"><label class="btn" style="cursor:pointer">📷 Thêm ảnh<input type="file" id="vbFile2" accept="image/*" multiple hidden></label><button class="btn ghost" id="vbText2">✎ Thẻ chữ</button><button class="btn ghost" id="vbTidy2" title="Xếp lại gọn từ góc trên bên trái">⇲ Xếp gọn</button></div>
+  <div class="mute vbhint" id="vbHint" style="margin:-4px 0 10px">Chạm giữ một ô rồi kéo để đổi chỗ · kéo góc ◢ để đổi cỡ.</div>
   <div class="row" id="vbMake" style="display:none;margin-bottom:10px"><input id="vbT" class="grow" placeholder="Câu / mục tiêu muốn nhìn thấy mỗi ngày…"><select id="vbC"></select><button class="btn" id="vbAdd">Thêm</button><button class="btn ghost" id="vbCancel">Huỷ</button></div>
   <div class="vbstage">
     <div class="vb" id="vbGrid"></div>
@@ -497,7 +520,7 @@ body{overscroll-behavior-y:contain}
         <button class="btn ghost" id="vbText">+ Thẻ chữ</button>
   </div>
     <div class="vbsz"><label class="mute">Cỡ ô: <input type="range" id="vbSz" min="90" max="420" step="10" style="vertical-align:middle;width:150px;padding:0"> <span id="vbSzV"></span>px</label><button class="btn ghost" id="vbSzR">Đặt lại cỡ</button><button class="btn ghost" id="vbTidy" title="Xếp lại gọn từ góc trên bên trái">⇲ Tự xếp gọn</button></div>
-    <p class="mute">Dán ảnh bằng Ctrl+V, hoặc kéo thả ảnh vào bảng. Giữ rồi kéo một ô tới vị trí muốn chèn: các ô khác tự né và dồn lại cho khít, không để khoảng trống. Kéo góc ◢ để đổi cỡ từng ô (bấm đúp vào góc để về mặc định). Ảnh được nén và chỉ lưu trong trình duyệt này.</p>
+    <p class="mute">Dán ảnh bằng Ctrl+V, hoặc kéo thả ảnh vào bảng. Giữ rồi kéo một ô tới vị trí muốn chèn: các ô khác tự né và dồn lại cho khít, không để khoảng trống. Kéo góc ◢ để đổi cỡ từng ô (bấm đúp vào góc để về mặc định). Ảnh được nén và lưu trong trình duyệt; nếu đã đăng nhập đồng bộ, ảnh tự có trên các thiết bị.</p>
   <div class="plab">Trang chủ</div>
   <label class="mute" style="display:block">Cỡ ảnh: <b id="hmSzV"></b>px <span class="mute">(càng nhỏ, càng nhiều ảnh)</span><input type="range" id="hmSz" min="50" max="220" step="10" style="width:100%;padding:0"></label>
   <label class="mute" style="display:block;margin:8px 0 12px">Đổi ảnh mỗi <b id="hmSecV"></b> giây<input type="range" id="hmSec" min="1" max="30" step="1" style="width:100%;padding:0"></label>
@@ -557,19 +580,24 @@ function rTodo(){
   $('#tStat').textContent=`${DN[i]} ${d.getDate()}/${d.getMonth()+1}${tDay===iso(new Date())?' (hôm nay)':''} · ${tot?`xong ${dn}/${tot}`:'chưa có việc nào'}`;
   $('#tBar').style.width=tot?dn/tot*100+'%':'0';
   const L=[];
-  pl.forEach(({p,t})=>{const q=t.pri||2;L.push({q,s:p.pri||2,dn:t.dd[i]?1:0,h:`<div class="tw2"><div class="todo ${t.dd[i]?'done':''}" style="border-left:3px solid ${GPC[q]};padding-left:8px"><input type="checkbox" data-pl="${p.id}|${t.id}" ${t.dd[i]?'checked':''}><span>${esc(t.t)||'(chưa đặt tên)'} <small class="mute">${esc(p.name)}</small></span><i class="prb p${q}">${PRI[q]}</i>${subBtn('p:'+p.id+':'+t.id,t)}</div>${subsHtml('p:'+p.id+':'+t.id,t)}</div>`})});
-  own.forEach(x=>{const q=x.pri||2;L.push({q,s:0,dn:x.done?1:0,h:`<div class="tw2"><div class="todo ${x.done?'done':''}" style="border-left:3px solid ${GPC[q]};padding-left:8px"><input type="checkbox" data-id="${x.id}" ${x.done?'checked':''}><input class="tx ${x.done?'d':''}" data-edit="${x.id}" value="${esc(x.text)}"><button class="prb p${q}" data-cyc="${x.id}" title="Độ quan trọng — bấm để đổi">${PRI[q]}</button><button class="x" data-mv="${x.id}" title="Chuyển sang ngày mai">→</button>${subBtn('o:'+x.id,x)}<button class="x" data-del="${x.id}">✕</button></div>${subsHtml('o:'+x.id,x)}</div>`})});
+  pl.forEach(({p,t})=>{const q=t.pri||2;L.push({q,s:p.pri||2,dn:t.dd[i]?1:0,h:`<div class="tw2"><div class="todo ${t.dd[i]?'done':''}" style="border-left:3px solid ${GPC[q]};padding-left:8px"><input type="checkbox" data-pl="${p.id}|${t.id}" ${t.dd[i]?'checked':''}><span>${esc(t.t)||'(chưa đặt tên)'} <small class="mute">${esc(p.name)}</small></span><div class="ta"><i class="prb p${q}">${PRI[q]}</i>${subBtn('p:'+p.id+':'+t.id,t)}</div></div>${subsHtml('p:'+p.id+':'+t.id,t)}</div>`})});
+  own.forEach(x=>{const q=x.pri||2;L.push({q,s:0,dn:x.done?1:0,h:`<div class="tw2"><div class="todo ${x.done?'done':''}" style="border-left:3px solid ${GPC[q]};padding-left:8px"><input type="checkbox" data-id="${x.id}" ${x.done?'checked':''}><textarea class="tx ${x.done?'d':''}" rows="1" data-edit="${x.id}">${esc(x.text)}</textarea><div class="ta"><button class="prb p${q}" data-cyc="${x.id}" title="Độ quan trọng — bấm để đổi">${PRI[q]}</button><button class="x" data-mv="${x.id}" title="Chuyển sang ngày mai">→</button>${subBtn('o:'+x.id,x)}<button class="x" data-del="${x.id}">✕</button></div></div>${subsHtml('o:'+x.id,x)}</div>`})});
   L.sort((a,b)=>a.dn-b.dn||b.q-a.q||b.s-a.s);
   $('#tList').innerHTML=L.map(x=>x.h).join('');
   rTev();
   if(fS){const el=document.querySelector(`.addsub[data-sk="${fS}"]`);if(el)el.focus();fS=null}
+  fitTx($('#tList'));requestAnimationFrame(()=>fitTx($('#tList')))
 }
+// ô chữ tự giãn theo nội dung (không cắt chữ dài)
+function fitTx(root){root.querySelectorAll('textarea.tx').forEach(t=>{t.style.height='auto';if(t.scrollHeight)t.style.height=t.scrollHeight+'px'})}
+$('#tList').addEventListener('input',e=>{const t=e.target;if(t.matches&&t.matches('textarea.tx')){t.style.height='auto';t.style.height=t.scrollHeight+'px'}});
+{let tw=0;new ResizeObserver(()=>{const w=$('#tList').clientWidth;if(w!==tw){tw=w;fitTx($('#tList'))}}).observe($('#tList'))}
 // ===== task nhỏ (subtask) =====
 const openSub=new Set();let fS=null;
 function subBtn(k,h){const s=h.subs||[],n=s.filter(x=>x.d).length;
   return (s.length?`<i class="cnt">${n}/${s.length}</i>`:'')+`<button class="x sbt" data-sk="${k}" data-sopen="1" title="Thêm task nhỏ">＋</button>`}
 function subsHtml(k,h){const s=h.subs||[];if(!s.length&&!openSub.has(k))return '';
-  return `<div class="subs">`+s.map(x=>`<div class="sub ${x.d?'done':''}"><input type="checkbox" data-sk="${k}" data-sc="${x.id}" ${x.d?'checked':''}><input class="tx ${x.d?'d':''}" data-sk="${k}" data-se="${x.id}" value="${esc(x.t)}"><button class="x" data-sk="${k}" data-sdel="${x.id}">✕</button></div>`).join('')+`<input class="addsub" data-sk="${k}" data-sadd="1" placeholder="+ task nhỏ (Enter)"></div>`}
+  return `<div class="subs">`+s.map(x=>`<div class="sub ${x.d?'done':''}"><input type="checkbox" data-sk="${k}" data-sc="${x.id}" ${x.d?'checked':''}><textarea class="tx ${x.d?'d':''}" rows="1" data-sk="${k}" data-se="${x.id}">${esc(x.t)}</textarea><button class="x" data-sk="${k}" data-sdel="${x.id}">✕</button></div>`).join('')+`<input class="addsub" data-sk="${k}" data-sadd="1" placeholder="+ task nhỏ (Enter)"></div>`}
 function subHold(k){const[a,b,c]=k.split(':');if(a==='o')return S.todos.find(t=>t.id===b);
   const W=dayRef(tDay).W,p=W&&W.projects.find(p=>p.id===b);return p&&p.tasks.find(t=>t.id===c)}
 function addTodo(){const v=$('#tIn').value.trim();if(!v)return;S.todos.push({id:uid(),text:v,pri:+$('#tPri').value,date:tDay,done:0});$('#tIn').value='';save();rPlan()}
@@ -581,11 +609,11 @@ $('#tList').onchange=e=>{const d=e.target.dataset;
   if(d.sadd)return;
   if(d.id)S.todos.find(t=>t.id===d.id).done=e.target.checked?1:0;
   if(d.pl){const[a,b]=d.pl.split('|'),r=dayRef(tDay);r.W.projects.find(p=>p.id===a).tasks.find(t=>t.id===b).dd[r.i]=e.target.checked?1:0}
-  if(d.edit)S.todos.find(t=>t.id===d.edit).text=e.target.value;
+  if(d.edit)S.todos.find(t=>t.id===d.edit).text=e.target.value.replace(/\s*\n+\s*/g,' ').trim();
   if(d.sk&&(d.sc||d.se)){const h=subHold(d.sk),x=h&&(h.subs||[]).find(z=>z.id===(d.sc||d.se));
-    if(x){if(d.sc)x.d=e.target.checked?1:0;else x.t=e.target.value}}
+    if(x){if(d.sc)x.d=e.target.checked?1:0;else x.t=e.target.value.replace(/\s*\n+\s*/g,' ').trim()}}
   save();rPlan()};
-$('#tList').onkeydown=e=>{const d=e.target.dataset;if(e.key!=='Enter'||!d.sadd)return;
+$('#tList').onkeydown=e=>{const d=e.target.dataset;if(e.key==='Enter'&&!e.shiftKey&&e.target.matches('textarea.tx')){e.preventDefault();e.target.blur();return}if(e.key!=='Enter'||!d.sadd)return;
   const v=e.target.value.trim(),h=subHold(d.sk);if(!v||!h)return;
   (h.subs=h.subs||[]).push({id:uid(),t:v,d:0});e.target.value='';fS=d.sk;save();rPlan()};
 $('#tList').onclick=e=>{const b=e.target.closest('button');if(!b)return;const d=b.dataset;
@@ -754,7 +782,7 @@ $('#goals').onkeydown=e=>{const a=e.target.dataset.madd,v=e.target.value.trim();
 const VG={'Cam':['#b5482f','#e8a06a'],'Xanh lá':['#3f6b5a','#9cc7b2'],'Xanh dương':['#3b6ea5','#9cc3ee'],'Tím':['#7a4f9b','#d3a9ee'],'Hồng':['#c2576b','#f3b3bf'],'Đen':['#23211e','#6b645a']};
 let VB=[],dragId=null;try{VB=JSON.parse(localStorage.getItem('studyhub_vb')||'[]')}catch(e){}
 function saveVB(){try{localStorage.setItem('studyhub_vb',JSON.stringify(VB));if(window._schedVB)_schedVB();return true}catch(e){alert('Bộ nhớ trình duyệt đã đầy. Hãy xoá bớt ảnh rồi thử lại.');return false}}
-const vbBase=()=>S.vbSize||180;
+const vbBase=()=>{const t=S.vbSize||180;return innerWidth<600?Math.min(t,Math.floor((innerWidth-24)/2)):t};
 const tfs=(v,w)=>Math.round((v.t.length>60?15:v.t.length>25?19:25)*Math.min(2.2,Math.max(.75,w/180)));
 const vbRes='<i class="vbr" data-vr="1" title="Kéo để đổi cỡ · bấm đúp để về mặc định">◢</i>';
 function rVB(){const g=$('#vbGrid');g.style.setProperty('--vbw',vbBase()+'px');g.classList.add('pend');
@@ -766,6 +794,8 @@ function addFiles(fs){[...fs].filter(f=>f.type.startsWith('image/')).forEach(f=>
   const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);
   VB.push({id:uid(),k:'img',src:c.toDataURL('image/jpeg',.72)});if(!saveVB())VB.pop();rVB()};im.src=r.result};r.readAsDataURL(f)})}
 $('#vbFile').onchange=e=>{addFiles(e.target.files);e.target.value=''};
+['#vbFile2','#vbFile3'].forEach(i=>$(i).onchange=e=>{addFiles(e.target.files);e.target.value=''});
+$('#vbText2').onclick=()=>{$('#vbMake').style.display='flex';$('#vbT').focus()};
 document.addEventListener('paste',e=>{const f=[...(e.clipboardData?e.clipboardData.items:[])].filter(i=>i.type.startsWith('image/')).map(i=>i.getAsFile()).filter(Boolean);if(f.length)addFiles(f)});
 $('#vb').ondragover=e=>e.preventDefault();
 $('#vb').ondrop=e=>{e.preventDefault();if(e.dataTransfer.files.length)addFiles(e.dataTransfer.files)};
@@ -1081,6 +1111,7 @@ $('#vbSz').oninput=e=>{S.vbSize=+e.target.value;$('#vbSzV').textContent=S.vbSize
 $('#vbSz').onchange=()=>{save();vbNorm(true)};
 $('#vbSzR').onclick=()=>{S.vbSize=180;VB.forEach(v=>{delete v.s});save();saveVB();$('#vbSz').value=180;$('#vbSzV').textContent=180;rVB()};
 $('#vbTidy').onclick=()=>{VB.forEach(v=>{delete v.x;delete v.y});saveVB();rVB()};
+$('#vbTidy2').onclick=()=>$('#vbTidy').click();
 // hít vào cạnh ô bên cạnh / lưới 8px
 function vbMagnet(r,skip,list){const o=list||vbEls(skip).map(vbRect),gw=vbGrid.clientWidth;
   const near=(v,c)=>{let b=Math.round(v/4)*4,d=Math.abs(b-v);c.forEach(k=>{const e=Math.abs(k-v);if(e<10&&e<=d){b=k;d=e}});return b};
@@ -1267,7 +1298,7 @@ function setLang(l,first){S.lang=l;document.documentElement.lang=l;$('#lang').fi
   if(!first){save();tickClock();hmBuild&&hmBuild()}}
 $('#lang').onclick=()=>setLang(S.lang==='en'?'vi':'en');
 if(S.lang==='en')setLang('en',true);
-try{[['Chọn nhanh theo tiết (bấm 1 tiết, hoặc bấm tiết đầu rồi tiết cuối)','Quick pick by period (tap one period, or tap the first then the last)'],['Giáo dục thể chất (ca học)','Physical education (slot)']].forEach(([a,b])=>LD.set(a,b))}catch(e){}
+try{[['Chọn nhanh theo tiết (bấm 1 tiết, hoặc bấm tiết đầu rồi tiết cuối)','Quick pick by period (tap one period, or tap the first then the last)'],['Giáo dục thể chất (ca học)','Physical education (slot)'],['📷 Thêm ảnh','📷 Add photos'],['✎ Thẻ chữ','✎ Text card'],['⇲ Xếp gọn','⇲ Tidy'],['Chạm giữ một ô rồi kéo để đổi chỗ · kéo góc ◢ để đổi cỡ.','Press and hold a tile, then drag to move · drag the ◢ corner to resize.']].forEach(([a,b])=>LD.set(a,b))}catch(e){}
 
 // ===== ĐỒNG BỘ ĐÁM MÂY (Firebase Auth + Firestore) =====
 (function(){
@@ -1290,12 +1321,13 @@ window._schedVB=(d)=>schedVB(d);
 window._pushSnd=()=>pushSnd();
 
 const P=s=>`users/${user.uid}/${s}`;
+const sv=v=>{const c=Object.assign({},v);delete c.x;delete c.y;return c};
 async function pushMain(){if(!user)return;try{setSt('Đang đồng bộ…');if(!S._u){S._u=Date.now();lastJson=clean();lsSave()}
   await db.doc(P('sync/main')).set({json:JSON.stringify(S),u:S._u});setSt('Đã đồng bộ ✓ '+hh())}catch(e){setSt('Lỗi đồng bộ: '+(e.code||e.message))}}
 
 function schedVB(delay){if(!user)return;clearTimeout(vbT);vbT=setTimeout(async()=>{vbT=null;
   try{setSt('Đang đồng bộ…');const ops=[],seen=new Set();
-    VB.forEach((v,i)=>{seen.add(v.id);const j=JSON.stringify(v),sig=j+'|'+i;if(vbMap.get(v.id)!==sig){ops.push(['s',v.id,{json:j,o:i}]);vbMap.set(v.id,sig)}});
+    VB.forEach((v,i)=>{seen.add(v.id);const j=JSON.stringify(sv(v)),sig=j+'|'+i;if(vbMap.get(v.id)!==sig){ops.push(['s',v.id,{json:j,o:i}]);vbMap.set(v.id,sig)}});
     [...vbMap.keys()].forEach(id=>{if(!seen.has(id)){ops.push(['d',id]);vbMap.delete(id)}});
     for(let i=0;i<ops.length;i+=15){const b=db.batch();ops.slice(i,i+15).forEach(o=>{const r=db.doc(P('vb/'+o[1]));o[0]==='s'?b.set(r,o[2]):b.delete(r)});await b.commit()}
     setSt('Đã đồng bộ ✓ '+hh())}catch(e){setSt('Lỗi đồng bộ: '+(e.code||e.message))}},delay===undefined?1200:delay)}
@@ -1347,8 +1379,9 @@ function listen(){
   unsubs.push(db.collection(P('vb')).onSnapshot(s=>{
     if(s.metadata.hasPendingWrites||(s.empty&&s.metadata.fromCache))return;
     const arr=[],mp=new Map();s.forEach(d=>{const x=d.data();arr.push([x.o,JSON.parse(x.json)]);mp.set(d.id,x.json+'|'+x.o)});
-    if(vbT)return;vbMap=mp;arr.sort((a,b)=>a[0]-b[0]);const nv=arr.map(a=>a[1]);
-    if(JSON.stringify(nv)===JSON.stringify(VB))return;
+    if(vbT)return;vbMap=mp;arr.sort((a,b)=>a[0]-b[0]);let nv=arr.map(a=>a[1]);
+    if(JSON.stringify(nv.map(sv))===JSON.stringify(VB.map(sv)))return;
+    const loc=new Map(VB.map(v=>[v.id,v]));nv=nv.map(v=>{const l=loc.get(v.id);if(l&&l.x!=null){v.x=l.x;v.y=l.y}return v});
     VB=nv;try{localStorage.setItem('studyhub_vb',JSON.stringify(VB))}catch(e){}rVB();hmBuild()}));
   unsubs.push(db.doc(P('sync/snd')).onSnapshot(s=>{
     if(s.metadata.hasPendingWrites||!s.exists)return;const d=s.data();if((d.u||0)>(+localStorage.getItem(kU)||0))pullSnd(d)}));
