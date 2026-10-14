@@ -803,7 +803,10 @@ const PC=['#b5482f','#3f6b5a','#3b6ea5','#b07d2b','#7a4f9b','#c2576b'],DS=['T2',
 const wkD=()=>{const k=iso(monday(wOff));return S.weeks[k]=S.weeks[k]||{projects:[]}};
 let fP=null,fT=null,fPS=null;const openPS=new Set();
 function psubs(pid,t){const k=pid+'|'+t.id,s=t.subs||[];if(!s.length&&!openPS.has(k))return '';
-  return `<div class="subs">`+s.map(x=>`<div class="sub ${x.d?'done':''}"><input type="checkbox" data-psc="${k}|${x.id}" ${x.d?'checked':''}><input class="pin" style="flex:1" data-pse="${k}|${x.id}" value="${esc(x.t)}" placeholder="Task nhỏ"><button class="x" data-psdel="${k}|${x.id}">✕</button></div>`).join('')+`<input class="addsub" data-psadd="${k}" placeholder="+ task nhỏ (Enter)"></div>`}
+  return `<div class="subs">`+s.map(x=>{const k2=k+'|'+x.id,ss=x.subs||[];
+    return `<div class="sub ${x.d?'done':''}"><input type="checkbox" data-psc="${k2}" ${x.d?'checked':''}><input class="pin" style="flex:1" data-pse="${k2}" value="${esc(x.t)}" placeholder="Task nhỏ">${ss.length?`<i class="cnt" title="Task nhỏ hơn đã xong">${ss.filter(y=>y.d).length}/${ss.length}</i>`:''}<button class="x sbt" data-psk="${k2}" title="Thêm task nhỏ hơn">＋</button><button class="x" data-psdel="${k2}">✕</button></div>`+
+    ((ss.length||openPS.has(k2))?`<div class="subs">`+ss.map(y=>`<div class="sub ${y.d?'done':''}"><input type="checkbox" data-psc="${k2}|${y.id}" ${y.d?'checked':''}><input class="pin" style="flex:1" data-pse="${k2}|${y.id}" value="${esc(y.t)}" placeholder="Task nhỏ hơn"><button class="x" data-psdel="${k2}|${y.id}">✕</button></div>`).join('')+`<input class="addsub" data-psadd="${k2}" placeholder="+ task nhỏ hơn (Enter)"></div>`:'')}).join('')+`<input class="addsub" data-psadd="${k}" placeholder="+ task nhỏ (Enter)"></div>`}
+function psHold(k){const a=k.split('|'),p=fp(wkD(),a[0]),t=p&&p.tasks.find(t=>t.id===a[1]);if(!t)return null;if(a.length===2)return t;const x=(t.subs||[]).find(z=>z.id===a[2]);return a.length===3?x:x&&(x.subs||[]).find(z=>z.id===a[3])}
 const psFind=k=>{const[a,b]=k.split('|'),p=fp(wkD(),a),t=p&&p.tasks.find(t=>t.id===b);return t};
 const fp=(W,id)=>W.projects.find(p=>p.id===id);
 function rPlan(){
@@ -830,12 +833,12 @@ $('#pAddProj').onclick=()=>{const W=wkD(),id=uid();W.projects.push({id,pri:2,nam
 $('#projs').oninput=e=>{const d=e.target.dataset,W=wkD();
   if(d.pn){fp(W,d.pn).name=e.target.value}
   if(d.tn){const[a,b]=d.tn.split('|');fp(W,a).tasks.find(t=>t.id===b).t=e.target.value}
-  if(d.pse){const[a,b,c]=d.pse.split('|'),t=psFind(a+'|'+b),x=t&&(t.subs||[]).find(z=>z.id===c);if(x)x.t=e.target.value}
+  if(d.pse){const x=psHold(d.pse);if(x)x.t=e.target.value}
   save()};
-$('#projs').onchange=e=>{const d=e.target.dataset;if(d.psc){const[a,b,c]=d.psc.split('|'),t=psFind(a+'|'+b),x=t&&(t.subs||[]).find(z=>z.id===c);if(x)x.d=e.target.checked?1:0;save();rPlan();return}if(d.pn||d.tn||d.pse)rPlan()};
+$('#projs').onchange=e=>{const d=e.target.dataset;if(d.psc){const x=psHold(d.psc);if(x)x.d=e.target.checked?1:0;save();rPlan();return}if(d.pn||d.tn||d.pse)rPlan()};
 $('#projs').onclick=e=>{const b=e.target.closest('[data-pdel],[data-tdel],[data-tday],[data-pcol],[data-ppri],[data-tpri],[data-psk],[data-psdel]');if(!b)return;const d=b.dataset,W=wkD();
   if(d.psk){if(openPS.has(d.psk))openPS.delete(d.psk);else{openPS.add(d.psk);fPS=d.psk}}
-  if(d.psdel){const[a,c,x]=d.psdel.split('|'),t=psFind(a+'|'+c);if(t)t.subs=(t.subs||[]).filter(z=>z.id!==x)}
+  if(d.psdel){const a=d.psdel.split('|'),h=psHold(a.slice(0,-1).join('|'));if(h)h.subs=(h.subs||[]).filter(z=>z.id!==a[a.length-1])}
   if(d.pdel)W.projects=W.projects.filter(p=>p.id!==d.pdel);
   if(d.ppri){const p=fp(W,d.ppri);p.pri=(p.pri||2)%3+1}
   if(d.tpri){const[a,c]=d.tpri.split('|'),t=fp(W,a).tasks.find(t=>t.id===c);t.pri=(t.pri||2)%3+1}
@@ -845,7 +848,7 @@ $('#projs').onclick=e=>{const b=e.target.closest('[data-pdel],[data-tdel],[data-
     if(t.days.includes(n)){t.days=t.days.filter(x=>x!==n);delete t.dd[n]}else t.days.push(n)}
   save();rPlan()};
 $('#projs').onkeydown=e=>{const a=e.target.dataset.tadd,v=e.target.value.trim(),ps=e.target.dataset.psadd;
-  if(ps&&e.key==='Enter'&&v){const t=psFind(ps);if(t){(t.subs=t.subs||[]).push({id:uid(),t:v,d:0});fPS=ps;save();rPlan()}return}
+  if(ps&&e.key==='Enter'&&v){const t=psHold(ps);if(t){(t.subs=t.subs||[]).push({id:uid(),t:v,d:0});fPS=ps;save();rPlan()}return}
   if(a&&e.key==='Enter'&&v){fp(wkD(),a).tasks.push({id:uid(),t:v,pri:2,days:[],dd:{}});fT=a;save();rPlan()}};
 $('#pdays').onchange=e=>{const d=e.target.dataset;
   if(d.dchk){const[a,b,i]=d.dchk.split('|');fp(wkD(),a).tasks.find(t=>t.id===b).dd[i]=e.target.checked?1:0}
@@ -858,12 +861,12 @@ const go=n=>{wOff=n===0?0:wOff+n;rPlan()};
 $('#pPrev').onclick=()=>go(-1);$('#pNext').onclick=()=>go(1);$('#pNow').onclick=()=>go(0);
 $('#pCopy').onclick=()=>{S.clip=wkD().projects.map(p=>({...p,tasks:p.tasks.map(t=>({...t,dd:{}}))}));save();$('#pCopy').textContent='Đã sao chép ✓';setTimeout(()=>$('#pCopy').textContent='Sao chép',1400)};
 $('#pPaste').onclick=()=>{if(!S.clip||!S.clip.length){alert('Chưa có kế hoạch nào được sao chép. Hãy bấm “Sao chép” ở một tuần khác trước.');return}
-  const W=wkD();S.clip.forEach(p=>W.projects.push({...p,id:uid(),tasks:p.tasks.map(t=>({...t,id:uid(),dd:{},subs:(t.subs||[]).map(x=>({...x,id:uid(),d:0}))}))}));save();rPlan()};
+  const W=wkD();S.clip.forEach(p=>W.projects.push({...p,id:uid(),tasks:p.tasks.map(t=>({...t,id:uid(),dd:{},subs:(t.subs||[]).map(x=>({...x,id:uid(),d:0,subs:(x.subs||[]).map(y=>({...y,id:uid(),d:0}))}))}))}));save();rPlan()};
 $('#pEnd').onclick=()=>{
   if(!confirm('Kết thúc tuần? Những task chưa xong sẽ được chuyển sang tuần sau.'))return;
   const W=wkD(),N=S.weeks[iso(monday(wOff+1))]=S.weeks[iso(monday(wOff+1))]||{projects:[]};
   W.projects.forEach(p=>{
-    const ts=p.tasks.filter(t=>!t.days.length||t.days.some(d=>!t.dd[d])).map(t=>({id:uid(),t:t.t,pri:t.pri||2,days:t.days.filter(d=>!t.dd[d]),dd:{},subs:(t.subs||[]).filter(x=>!x.d).map(x=>({id:uid(),t:x.t,d:0}))}));
+    const ts=p.tasks.filter(t=>!t.days.length||t.days.some(d=>!t.dd[d])).map(t=>({id:uid(),t:t.t,pri:t.pri||2,days:t.days.filter(d=>!t.dd[d]),dd:{},subs:(t.subs||[]).filter(x=>!x.d).map(x=>({id:uid(),t:x.t,d:0,subs:(x.subs||[]).filter(y=>!y.d).map(y=>({id:uid(),t:y.t,d:0}))}))}));
     if(!ts.length)return;let q=N.projects.find(x=>x.name&&x.name===p.name);
     if(!q){q={id:uid(),pri:p.pri||2,name:p.name,color:p.color,tasks:[]};N.projects.push(q)}q.tasks.push(...ts)});
   W.ended=1;save();go(1)};
