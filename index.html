@@ -801,7 +801,10 @@ const DN=['Thứ 2','Thứ 3','Thứ 4','Thứ 5','Thứ 6','Thứ 7','CN'];
 S.weeks=S.weeks||{};
 const PC=['#b5482f','#3f6b5a','#3b6ea5','#b07d2b','#7a4f9b','#c2576b'],DS=['T2','T3','T4','T5','T6','T7','CN'];
 const wkD=()=>{const k=iso(monday(wOff));return S.weeks[k]=S.weeks[k]||{projects:[]}};
-let fP=null,fT=null;
+let fP=null,fT=null,fPS=null;const openPS=new Set();
+function psubs(pid,t){const k=pid+'|'+t.id,s=t.subs||[];if(!s.length&&!openPS.has(k))return '';
+  return `<div class="subs">`+s.map(x=>`<div class="sub ${x.d?'done':''}"><input type="checkbox" data-psc="${k}|${x.id}" ${x.d?'checked':''}><input class="pin" style="flex:1" data-pse="${k}|${x.id}" value="${esc(x.t)}" placeholder="Task nhỏ"><button class="x" data-psdel="${k}|${x.id}">✕</button></div>`).join('')+`<input class="addsub" data-psadd="${k}" placeholder="+ task nhỏ (Enter)"></div>`}
+const psFind=k=>{const[a,b]=k.split('|'),p=fp(wkD(),a),t=p&&p.tasks.find(t=>t.id===b);return t};
 const fp=(W,id)=>W.projects.find(p=>p.id===id);
 function rPlan(){
   const m=monday(wOff),W=wkD(),td=iso(new Date()),e=new Date(m);e.setDate(m.getDate()+6);
@@ -809,12 +812,12 @@ function rPlan(){
   let tot=0,dn=0;W.projects.forEach(p=>p.tasks.forEach(t=>{tot+=t.days.length;t.days.forEach(d=>{if(t.dd[d])dn++})}));
   const pct=tot?Math.round(dn/tot*100):0;$('#pStat').textContent=`${dn}/${tot} · ${pct}%`;$('#pBar').style.width=pct+'%';
   $('#projs').innerHTML=[...W.projects].sort((a,b)=>(b.pri||2)-(a.pri||2)).map(p=>`<div class="proj" style="--pc:${p.color}"><div class="row" style="flex-wrap:nowrap"><i class="pdot" data-pcol="${p.id}" title="Đổi màu"></i><input class="pname" data-pn="${p.id}" value="${esc(p.name)}" placeholder="Tên dự án / môn học"><button class="prb p${p.pri||2}" data-ppri="${p.id}" title="Độ quan trọng của dự án">${PRI[p.pri||2]}</button><button class="x" data-pdel="${p.id}">✕</button></div>`+
-    [...p.tasks].sort((a,b)=>(b.pri||2)-(a.pri||2)).map(t=>`<div class="ptask"><div class="row"><span class="cnt">${t.days.filter(d=>t.dd[d]).length}/${t.days.length}</span><input class="pin" style="flex:1" data-tn="${p.id}|${t.id}" value="${esc(t.t)}" placeholder="Task"><button class="prb p${t.pri||2}" data-tpri="${p.id}|${t.id}" title="Độ quan trọng của task">${PRI[t.pri||2]}</button><button class="x" data-tdel="${p.id}|${t.id}">✕</button></div><div class="dchips">${DS.map((n,i)=>`<button class="dc ${t.days.includes(i)?'on':''}" data-tday="${p.id}|${t.id}|${i}">${n}</button>`).join('')}</div></div>`).join('')+
+    [...p.tasks].sort((a,b)=>(b.pri||2)-(a.pri||2)).map(t=>`<div class="ptask"><div class="row"><span class="cnt">${t.days.filter(d=>t.dd[d]).length}/${t.days.length}</span><input class="pin" style="flex:1" data-tn="${p.id}|${t.id}" value="${esc(t.t)}" placeholder="Task">${(t.subs||[]).length?`<i class="cnt" title="Task nhỏ đã xong">${t.subs.filter(x=>x.d).length}/${t.subs.length}</i>`:''}<button class="x sbt" data-psk="${p.id}|${t.id}" title="Thêm task nhỏ">＋</button><button class="prb p${t.pri||2}" data-tpri="${p.id}|${t.id}" title="Độ quan trọng của task">${PRI[t.pri||2]}</button><button class="x" data-tdel="${p.id}|${t.id}">✕</button></div><div class="dchips">${DS.map((n,i)=>`<button class="dc ${t.days.includes(i)?'on':''}" data-tday="${p.id}|${t.id}|${i}">${n}</button>`).join('')}</div>${psubs(p.id,t)}</div>`).join('')+
     `<input class="add" data-tadd="${p.id}" placeholder="+ thêm task (Enter)"></div>`).join('')||'<p class="mute">Bước 1: tạo dự án (một môn học). Bước 2: thêm task. Bước 3: chọn các ngày, tuần sẽ tự điền.</p>';
   $('#pdays').innerHTML=[...Array(7)].map((_,i)=>{
     const d=new Date(m);d.setDate(m.getDate()+i);const k=iso(d);
     
-    const L=[];W.projects.forEach(p=>p.tasks.forEach(t=>{if(t.days.includes(i)){const q=t.pri||2;L.push({q,s:p.pri||2,dn:t.dd[i]?1:0,h:`<label class="pt ${t.dd[i]?'dn':''}" style="--pc:${GPC[q]}"><input type="checkbox" data-dchk="${p.id}|${t.id}|${i}" ${t.dd[i]?'checked':''}><span><i class="gdot" style="background:${GPC[q]}"></i>${esc(t.t)||'(chưa đặt tên)'}<br><small class="mute">${esc(p.name)}</small></span></label>`})}}));
+    const L=[];W.projects.forEach(p=>p.tasks.forEach(t=>{if(t.days.includes(i)){const q=t.pri||2;L.push({q,s:p.pri||2,dn:t.dd[i]?1:0,h:`<label class="pt ${t.dd[i]?'dn':''}" style="--pc:${GPC[q]}"><input type="checkbox" data-dchk="${p.id}|${t.id}|${i}" ${t.dd[i]?'checked':''}><span><i class="gdot" style="background:${GPC[q]}"></i>${esc(t.t)||'(chưa đặt tên)'}${(t.subs||[]).length?` <small class="mute">(${t.subs.filter(x=>x.d).length}/${t.subs.length})</small>`:''}<br><small class="mute">${esc(p.name)}</small></span></label>`})}}));
     S.todos.filter(x=>x.date===k).forEach(x=>{const q=x.pri||2;L.push({q,s:0,dn:x.done?1:0,h:`<label class="pt ${x.done?'dn':''}" style="--pc:${GPC[q]}"><input type="checkbox" data-ochk="${x.id}" ${x.done?'checked':''}><span><i class="gdot" style="background:${GPC[q]}"></i>${esc(x.text)}</span></label>`})});
     L.sort((a,b)=>a.dn-b.dn||b.q-a.q||b.s-a.s);const it=[evsOn(k).map(evMini).join('')+L.map(x=>x.h).join('')],own='';
     return `<div class="pday ${k===td?'today':''}"><h3 data-goto="${k}" style="cursor:pointer" title="Xem trong Việc cần làm">${DN[i]} <span class="mute">${d.getDate()}/${d.getMonth()+1}</span><small class="mute" title="Âm lịch">${lunarOf(k)[0]}/${lunarOf(k)[1]}</small></h3>${it.join('')}${own}<input class="add" data-dadd="${k}" placeholder="+ việc"></div>`}).join('');
@@ -822,14 +825,17 @@ function rPlan(){
   $('#pUn').innerHTML=un.length?`<div class="plab">Chưa xếp ngày</div><div class="row">${un.join('')}</div>`:'';
   $('#pNote').value=S.goals[iso(m)]||'';
   if(fP){const el=document.querySelector(`[data-pn="${fP}"]`);if(el)el.focus();fP=null}
-  if(fT){const el=document.querySelector(`[data-tadd="${fT}"]`);if(el)el.focus();fT=null}rTodo()}
+  if(fT){const el=document.querySelector(`[data-tadd="${fT}"]`);if(el)el.focus();fT=null}if(fPS){const el=document.querySelector(`[data-psadd="${fPS}"]`);if(el)el.focus();fPS=null}rTodo()}
 $('#pAddProj').onclick=()=>{const W=wkD(),id=uid();W.projects.push({id,pri:2,name:'',color:PC[W.projects.length%PC.length],tasks:[]});fP=id;save();rPlan()};
 $('#projs').oninput=e=>{const d=e.target.dataset,W=wkD();
   if(d.pn){fp(W,d.pn).name=e.target.value}
   if(d.tn){const[a,b]=d.tn.split('|');fp(W,a).tasks.find(t=>t.id===b).t=e.target.value}
+  if(d.pse){const[a,b,c]=d.pse.split('|'),t=psFind(a+'|'+b),x=t&&(t.subs||[]).find(z=>z.id===c);if(x)x.t=e.target.value}
   save()};
-$('#projs').onchange=e=>{if(e.target.dataset.pn||e.target.dataset.tn)rPlan()};
-$('#projs').onclick=e=>{const b=e.target.closest('[data-pdel],[data-tdel],[data-tday],[data-pcol],[data-ppri],[data-tpri]');if(!b)return;const d=b.dataset,W=wkD();
+$('#projs').onchange=e=>{const d=e.target.dataset;if(d.psc){const[a,b,c]=d.psc.split('|'),t=psFind(a+'|'+b),x=t&&(t.subs||[]).find(z=>z.id===c);if(x)x.d=e.target.checked?1:0;save();rPlan();return}if(d.pn||d.tn||d.pse)rPlan()};
+$('#projs').onclick=e=>{const b=e.target.closest('[data-pdel],[data-tdel],[data-tday],[data-pcol],[data-ppri],[data-tpri],[data-psk],[data-psdel]');if(!b)return;const d=b.dataset,W=wkD();
+  if(d.psk){if(openPS.has(d.psk))openPS.delete(d.psk);else{openPS.add(d.psk);fPS=d.psk}}
+  if(d.psdel){const[a,c,x]=d.psdel.split('|'),t=psFind(a+'|'+c);if(t)t.subs=(t.subs||[]).filter(z=>z.id!==x)}
   if(d.pdel)W.projects=W.projects.filter(p=>p.id!==d.pdel);
   if(d.ppri){const p=fp(W,d.ppri);p.pri=(p.pri||2)%3+1}
   if(d.tpri){const[a,c]=d.tpri.split('|'),t=fp(W,a).tasks.find(t=>t.id===c);t.pri=(t.pri||2)%3+1}
@@ -838,7 +844,8 @@ $('#projs').onclick=e=>{const b=e.target.closest('[data-pdel],[data-tdel],[data-
   if(d.tday){const[a,c,i]=d.tday.split('|'),t=fp(W,a).tasks.find(t=>t.id===c),n=+i;
     if(t.days.includes(n)){t.days=t.days.filter(x=>x!==n);delete t.dd[n]}else t.days.push(n)}
   save();rPlan()};
-$('#projs').onkeydown=e=>{const a=e.target.dataset.tadd,v=e.target.value.trim();
+$('#projs').onkeydown=e=>{const a=e.target.dataset.tadd,v=e.target.value.trim(),ps=e.target.dataset.psadd;
+  if(ps&&e.key==='Enter'&&v){const t=psFind(ps);if(t){(t.subs=t.subs||[]).push({id:uid(),t:v,d:0});fPS=ps;save();rPlan()}return}
   if(a&&e.key==='Enter'&&v){fp(wkD(),a).tasks.push({id:uid(),t:v,pri:2,days:[],dd:{}});fT=a;save();rPlan()}};
 $('#pdays').onchange=e=>{const d=e.target.dataset;
   if(d.dchk){const[a,b,i]=d.dchk.split('|');fp(wkD(),a).tasks.find(t=>t.id===b).dd[i]=e.target.checked?1:0}
@@ -851,12 +858,12 @@ const go=n=>{wOff=n===0?0:wOff+n;rPlan()};
 $('#pPrev').onclick=()=>go(-1);$('#pNext').onclick=()=>go(1);$('#pNow').onclick=()=>go(0);
 $('#pCopy').onclick=()=>{S.clip=wkD().projects.map(p=>({...p,tasks:p.tasks.map(t=>({...t,dd:{}}))}));save();$('#pCopy').textContent='Đã sao chép ✓';setTimeout(()=>$('#pCopy').textContent='Sao chép',1400)};
 $('#pPaste').onclick=()=>{if(!S.clip||!S.clip.length){alert('Chưa có kế hoạch nào được sao chép. Hãy bấm “Sao chép” ở một tuần khác trước.');return}
-  const W=wkD();S.clip.forEach(p=>W.projects.push({...p,id:uid(),tasks:p.tasks.map(t=>({...t,id:uid(),dd:{}}))}));save();rPlan()};
+  const W=wkD();S.clip.forEach(p=>W.projects.push({...p,id:uid(),tasks:p.tasks.map(t=>({...t,id:uid(),dd:{},subs:(t.subs||[]).map(x=>({...x,id:uid(),d:0}))}))}));save();rPlan()};
 $('#pEnd').onclick=()=>{
   if(!confirm('Kết thúc tuần? Những task chưa xong sẽ được chuyển sang tuần sau.'))return;
   const W=wkD(),N=S.weeks[iso(monday(wOff+1))]=S.weeks[iso(monday(wOff+1))]||{projects:[]};
   W.projects.forEach(p=>{
-    const ts=p.tasks.filter(t=>!t.days.length||t.days.some(d=>!t.dd[d])).map(t=>({id:uid(),t:t.t,pri:t.pri||2,days:t.days.filter(d=>!t.dd[d]),dd:{}}));
+    const ts=p.tasks.filter(t=>!t.days.length||t.days.some(d=>!t.dd[d])).map(t=>({id:uid(),t:t.t,pri:t.pri||2,days:t.days.filter(d=>!t.dd[d]),dd:{},subs:(t.subs||[]).filter(x=>!x.d).map(x=>({id:uid(),t:x.t,d:0}))}));
     if(!ts.length)return;let q=N.projects.find(x=>x.name&&x.name===p.name);
     if(!q){q={id:uid(),pri:p.pri||2,name:p.name,color:p.color,tasks:[]};N.projects.push(q)}q.tasks.push(...ts)});
   W.ended=1;save();go(1)};
@@ -1587,7 +1594,7 @@ $('#ntDel').onclick=()=>{if(!confirm('Xoá trang này?'))return;N.pages=N.pages.
 $('#ntPng').onclick=()=>{const o=document.createElement('canvas');o.width=PW*2;o.height=P.h*2;const c=o.getContext('2d');c.fillStyle='#fffdf8';c.fillRect(0,0,o.width,o.height);c.scale(2,2);P.s.forEach(s=>line(c,s));P.x.forEach(t=>{c.fillStyle=t.c;c.font=`${t.z}px system-ui,sans-serif`;t.t.split('\n').forEach((l,i)=>c.fillText(l,t.x+16,t.y+t.z*(1.35*i+1)))});const a=document.createElement('a');a.download=(P.t||'ghi-chu')+'.png';a.href=o.toDataURL();a.click()};
 document.addEventListener('keydown',e=>{if(document.body.dataset.view!=='notes'||!(e.ctrlKey||e.metaKey)||/TEXTAREA|INPUT/.test(document.activeElement.tagName))return;const k=e.key.toLowerCase();if(k==='z'){e.preventDefault();back(U,R)}if(k==='y'){e.preventDefault();back(R,U)}});
 new ResizeObserver(()=>{clearTimeout(fit.t);fit.t=setTimeout(()=>{if(P&&!$('#notes').hidden)fit()},120)}).observe($('#ntW'));
-window.notesShow=async()=>{if(!N){N=(await dbGet('n'))||{pages:[mk()]};if(!N.pages.length)N.pages=[mk()];setTool('pen');swb();open(N.cur||N.pages[0].id)}else fit()};
+window.notesShow=async()=>{if(!N){N=(await dbGet('n'))||{pages:[mk()]};if(!N.pages.length)N.pages=[mk()];setTool('pen');swb();open(N.cur||N.pages[0].id);requestAnimationFrame(fit);setTimeout(fit,300)}else{requestAnimationFrame(fit);setTimeout(fit,300)}};
 })();
 
 /* ===== HỌC & THÚ CƯNG ===== */
