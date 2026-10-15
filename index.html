@@ -433,12 +433,27 @@ textarea.tx{resize:none;overflow:hidden;display:block;width:auto;font-size:14px;
 .g48 .c{display:grid;place-items:center;border-radius:8px;background:var(--bg);font-weight:800;font-size:calc(100cqw/var(--n)*.36)}
 .g48 .c.l{font-size:calc(100cqw/var(--n)*.28)}.g48 .c.xl{font-size:calc(100cqw/var(--n)*.21)}
 
+/* ===== Thời khóa biểu ===== */
+.tt-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.tt-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px;background:var(--card);max-height:calc(100vh - 240px)}
+.tt-g{--hh:56px;display:grid;grid-template-columns:50px repeat(7,minmax(110px,1fr));min-width:820px}
+.tt-h{position:sticky;top:0;z-index:3;background:var(--card);text-align:center;padding:6px 2px;border-bottom:1px solid var(--line);font-size:13px}
+.tt-h.today{color:var(--acc);font-weight:700}
+.tt-h small{display:block;color:var(--mute);font-size:10px;font-weight:400}
+.tt-adl{font-size:10px;color:var(--mute);text-align:right;padding:4px 6px 0 0;border-bottom:1px solid var(--line)}
+.tt-ad{border-left:1px solid var(--line);border-bottom:1px solid var(--line);padding:2px;min-height:26px}
+.tt-hr div{height:var(--hh);font-size:11px;color:var(--mute);text-align:right;padding-right:6px;border-top:1px solid var(--line)}
+.tt-col{position:relative;border-left:1px solid var(--line);background-image:linear-gradient(var(--line) 1px,transparent 1px);background-size:100% var(--hh)}
+.tt-col.today{background-color:color-mix(in srgb,var(--acc) 7%,transparent)}
+.tt-ev{position:absolute;border-radius:6px;padding:2px 5px;font-size:11px;line-height:1.25;color:#fff;overflow:hidden;cursor:pointer;border:1px solid #0003;word-break:break-word}
+.tt-ev b{display:block;font:700 10px ui-monospace,Menlo,monospace}
+.tt-now{position:absolute;left:0;right:0;height:2px;background:#e5484d;z-index:2;pointer-events:none}
 </style>
 </head>
 <body>
 <header>
   <h1>📚 Study Hub</h1>
-  <nav id="nav"><button data-v="home" class="on">🏠 Trang chủ</button><button data-v="vision">🖼 Vision board</button><button data-v="work">📋 Việc &amp; kế hoạch</button><button data-v="notes">✏️ Sổ tay</button><button data-v="focus">🐾 Học &amp; thú cưng</button><button data-v="fun">🎮 Giải trí</button></nav>
+  <nav id="nav"><button data-v="home" class="on">🏠 Trang chủ</button><button data-v="vision">🖼 Vision board</button><button data-v="work">📋 Việc &amp; kế hoạch</button><button data-v="notes">✏️ Sổ tay</button><button data-v="focus">🐾 Học &amp; thú cưng</button><button data-v="fun">🎮 Giải trí</button><button data-v="tkb">🗓 Thời khóa biểu</button></nav>
   <div class="hbar">
     <div class="hclk"><b id="clk">--:--:--</b><span class="mute" id="clock"></span></div>
     <button class="htm" id="hTm" title="Bộ đếm giờ — bấm để cuộn tới"><span id="hTmL">Pomodoro</span><b id="hT">25:00</b></button>
@@ -449,7 +464,7 @@ textarea.tx{resize:none;overflow:hidden;display:block;width:auto;font-size:14px;
   <div class="calpop" id="calPop" hidden></div>
   <span class="row"><button class="btn ghost" id="layReset" style="display:none">Đặt lại bố cục</button><button class="btn ghost" id="layBtn">✥ Bố cục</button><button class="btn ghost" id="syncBtn" title="Đồng bộ giữa các thiết bị">☁ <span id="syLbl">Đồng bộ</span></button><button class="btn ghost" id="lang" title="Ngôn ngữ / Language">🌐 VI</button><button class="btn ghost" id="theme">⚙ Cài đặt</button></span>
 </header>
-<nav id="bnav"><button data-v="home" class="on"><b>🏠</b><span>Trang chủ</span></button><button data-v="vision"><b>🖼</b><span>Vision</span></button><button data-v="work"><b>📋</b><span>Kế hoạch</span></button><button data-v="notes"><b>✏️</b><span>Sổ tay</span></button><button data-v="focus"><b>🐾</b><span>Học</span></button><button data-v="fun"><b>🎮</b><span>Giải trí</span></button><button data-bn="cal"><b>📅</b><span>Lịch</span></button><button data-bn="set"><b>⚙</b><span>Cài đặt</span></button></nav>
+<nav id="bnav"><button data-v="home" class="on"><b>🏠</b><span>Trang chủ</span></button><button data-v="vision"><b>🖼</b><span>Vision</span></button><button data-v="work"><b>📋</b><span>Kế hoạch</span></button><button data-v="notes"><b>✏️</b><span>Sổ tay</span></button><button data-v="focus"><b>🐾</b><span>Học</span></button><button data-v="fun"><b>🎮</b><span>Giải trí</span></button><button data-v="tkb"><b>🗓</b><span>TKB</span></button><button data-bn="cal"><b>📅</b><span>Lịch</span></button><button data-bn="set"><b>⚙</b><span>Cài đặt</span></button></nav>
 <label class="vbfab" id="vbFab" title="Thêm ảnh">＋<input type="file" id="vbFile3" accept="image/*" multiple hidden></label>
 <main id="vision" hidden><div class="card" id="vb">
   <div class="row vbbar" id="vbBar" style="margin-bottom:10px"><label class="btn" style="cursor:pointer">📷 Thêm ảnh<input type="file" id="vbFile2" accept="image/*" multiple hidden></label><button class="btn ghost" id="vbText2">✎ Thẻ chữ</button><button class="btn ghost" id="vbTidy2" title="Xếp lại gọn từ góc trên bên trái">⇲ Xếp gọn</button></div>
@@ -562,6 +577,11 @@ textarea.tx{resize:none;overflow:hidden;display:block;width:auto;font-size:14px;
     <div class="card" id="stC"></div>
   </div>
 </div></main>
+<main id="tkb" hidden><div class="card">
+  <div class="tt-bar"><h2 style="margin:0" class="grow">🗓 Thời khóa biểu</h2><button class="btn ghost" id="ttPrev">‹</button><b id="ttLbl" style="min-width:110px;text-align:center"></b><button class="btn ghost" id="ttNext">›</button><button class="btn ghost" id="ttNow">Tuần này</button><button class="btn" id="ttAdd">+ Thêm lịch học</button></div>
+  <div class="mute" style="margin-bottom:8px">Chỉ hiện các sự kiện đã tick “Lịch học” (kể cả sự kiện lặp lại).</div>
+  <div class="tt-wrap"><div class="tt-g" id="ttG"></div></div>
+</div></main>
 <main id="fun" hidden><div class="card">
   <div class="tabs" id="fnT"><button data-g="su" class="on">🔢 Sudoku</button><button data-g="mi">💣 Dò mìn</button><button data-g="g48">🟧 2048</button></div>
   <div class="gm" id="g_su"><div class="row gc"><select id="suL"><option value="40">Dễ</option><option value="33" selected>Trung bình</option><option value="28">Khó</option><option value="25">Chuyên gia</option><option value="22">Siêu khó</option></select><button class="btn" id="suN">Ván mới</button><b class="mono" id="suT">00:00</b><span class="mute" id="suM"></span></div>
@@ -596,10 +616,14 @@ textarea.tx{resize:none;overflow:hidden;display:block;width:auto;font-size:14px;
   <label>Tiêu đề</label><input id="evT" placeholder="Ví dụ: Học Toán, Khám răng, Đi chơi…">
   <label>Ngày</label><input type="date" id="evD">
   <div id="pcBox">
-    <div class="pl">Chọn nhanh theo tiết (bấm 1 tiết, hoặc bấm tiết đầu rồi tiết cuối)</div>
+    <div class="pl">NEU · Chọn nhanh theo tiết (bấm 1 tiết, hoặc bấm tiết đầu rồi tiết cuối)</div>
     <div class="pr" id="pcT"></div>
-    <div class="pl">Giáo dục thể chất (ca học)</div>
+    <div class="pl">NEU · Giáo dục thể chất (ca học)</div>
     <div class="pr" id="pcC"></div>
+    <div class="pl">UET · Ca học (bấm 1 ca = cả 2 phiên)</div>
+    <div class="pr" id="uC"></div>
+    <div class="pl">UET · Phiên (bấm 1 phiên, hoặc phiên đầu rồi phiên cuối)</div>
+    <div class="pr" id="uP"></div>
     <div class="mute" id="pcInfo" style="min-height:20px"></div>
   </div>
   <div class="row"><div class="grow"><label>Từ giờ</label><input type="time" id="evS"></div><div class="grow"><label>Đến giờ</label><input type="time" id="evE"></div></div>
@@ -607,6 +631,7 @@ textarea.tx{resize:none;overflow:hidden;display:block;width:auto;font-size:14px;
   <div class="row"><div class="grow"><label>Lặp lại</label><select id="evR"><option value="none">Không lặp</option><option value="day">Hằng ngày</option><option value="week">Hằng tuần (cùng thứ)</option><option value="month">Hằng tháng (cùng ngày)</option></select></div><div class="grow"><label>Màu</label><input type="color" id="evC"></div></div>
   <label>Lặp đến ngày (tuỳ chọn)</label><input type="date" id="evU">
   <label>Ghi chú / địa điểm</label><input id="evN">
+  <label style="display:flex;gap:8px;align-items:center;color:var(--ink);margin-top:10px"><input type="checkbox" id="evL" style="width:auto"> 📚 Đây là lịch học (hiện trong Thời khóa biểu)</label>
   <div class="row" style="margin-top:14px"><button class="btn del" id="evDel">Xoá</button><span class="grow"></span><button class="btn ghost" id="evCancel">Huỷ</button><button class="btn" id="evSave">Lưu</button></div>
 </dialog>
 <dialog id="syncdlg">
@@ -1048,14 +1073,14 @@ const evTm=x=>x.s?(x.e?x.s+'–'+x.e:x.s):'Cả ngày';
 const evLine=x=>`<div class="evr" data-ev="${x.id}" style="--ec:${x.c||'#3b6ea5'}"><b>${evTm(x)}</b><span>${esc(x.t)}</span>${x.n?`<small class="mute">${esc(x.n)}</small>`:''}${x.r&&x.r!=='none'?'<small class="mute">↻</small>':''}</div>`;
 const evMini=x=>`<div class="pev" data-ev="${x.id}" style="border-color:${x.c||'#3b6ea5'}">${x.s?`<b>${x.s}</b> `:''}${esc(x.t)}</div>`;
 let evId=null;
-function openEv(id,date){evId=id;const x=id?evBy(id):{t:'',d:date||tDay,s:'',e:'',c:'#3b6ea5',r:'none',u:'',n:''};if(!x)return;
-  $('#evT').value=x.t;$('#evD').value=x.d;$('#evS').value=x.s||'';$('#evE').value=x.e||'';$('#evC').value=x.c||'#3b6ea5';$('#evR').value=x.r||'none';$('#evU').value=x.u||'';$('#evN').value=x.n||'';
+function openEv(id,date){evId=id;const x=id?evBy(id):{t:'',d:date||tDay,s:'',e:'',c:'#3b6ea5',r:'none',u:'',n:'',l:0};if(!x)return;
+  $('#evT').value=x.t;$('#evD').value=x.d;$('#evS').value=x.s||'';$('#evE').value=x.e||'';$('#evC').value=x.c||'#3b6ea5';$('#evR').value=x.r||'none';$('#evU').value=x.u||'';$('#evN').value=x.n||'';$('#evL').checked=!!x.l;
   $('#evDel').style.display=id?'':'none';$('#evH').textContent=id?'Sửa lịch trình':'Thêm lịch trình';
   syncPc();if(!$('#evdlg').open)$('#evdlg').showModal();if(!id)$('#evT').focus()}
-function evRefresh(){rPlan();rHev();if(!$('#calPop').hidden)rCal()}
+function evRefresh(){rPlan();rHev();if(!$('#calPop').hidden)rCal();window.rTT&&rTT()}
 $('#evSave').onclick=()=>{const t=$('#evT').value.trim(),d=$('#evD').value;if(!t){$('#evT').focus();return}if(!d){$('#evD').focus();return}
   const a=$('#evS').value,b=$('#evE').value;if(a&&b&&b<a){alert('Giờ kết thúc phải sau giờ bắt đầu');return}
-  const o={t,d,s:a,e:b,c:$('#evC').value,r:$('#evR').value,u:$('#evU').value,n:$('#evN').value.trim()};
+  const o={t,d,s:a,e:b,c:$('#evC').value,r:$('#evR').value,u:$('#evU').value,n:$('#evN').value.trim(),l:$('#evL').checked?1:0};
   if(evId&&evBy(evId))Object.assign(evBy(evId),o);else S.events.push(Object.assign({id:uid()},o));
   save();$('#evdlg').close();evRefresh()};
 $('#evDel').onclick=()=>{const x=evBy(evId);if(!x)return;if(x.r&&x.r!=='none'&&!confirm('Xoá cả chuỗi lặp lại này?'))return;S.events=S.events.filter(z=>z.id!==evId);save();$('#evdlg').close();evRefresh()};
@@ -1065,20 +1090,31 @@ const TIET=[['06:45','08:00'],['08:10','09:25'],['09:35','10:50'],['11:00','12:1
 const CAHOC=[['07:00','09:00'],['09:30','11:30'],['13:30','15:30'],['15:45','17:45']];
 $('#pcT').innerHTML=TIET.map((_,i)=>`<button type="button" data-t="${i}">${i+1}</button>`).join('');
 $('#pcC').innerHTML=CAHOC.map((_,i)=>`<button type="button" data-c="${i}">Ca ${i+1}</button>`).join('');
+const UP=[['07:15','08:26'],['08:30','09:40'],['09:45','10:56'],['11:00','12:10'],['13:00','14:11'],['14:15','15:25'],['15:30','16:41'],['16:45','17:55']];
+$('#uC').innerHTML=[0,1,2,3].map(k=>`<button type="button" data-uc="${k}">Ca ${k+1}</button>`).join('');
+$('#uP').innerHTML=UP.map((_,i)=>`<button type="button" data-up="${i}">Ca ${(i>>1)+1} · P${i%2+1}</button>`).join('');
 const hm=t=>t.replace(/^0/,'').replace(':','h');
+const uInfo=(r,en)=>{const a=r.u,b=r.v,ca=en?'Slot ':'Ca ',ph=en?'Session ':'Phiên ';let n;
+  if(a===b)n=ca+((a>>1)+1)+' · '+ph+(a%2+1);else if(a%2===0&&b===a+1)n=ca+((a>>1)+1);else n=ca+((a>>1)+1)+' P'+(a%2+1)+' → '+ca+((b>>1)+1)+' P'+(b%2+1);
+  return 'UET · '+n+' · '+hm(UP[a][0])+' – '+hm(UP[b][1])};
 function pcRange(){const a=$('#evS').value,b=$('#evE').value;
   const ca=CAHOC.findIndex(x=>x[0]===a&&x[1]===b);if(ca>=0)return{c:ca};
   const i=TIET.findIndex(x=>x[0]===a),j=TIET.findIndex(x=>x[1]===b);
-  if(i>=0&&j>=i)return{i,j};return null}
+  if(i>=0&&j>=i)return{i,j};const u=UP.findIndex(x=>x[0]===a),v=UP.findIndex(x=>x[1]===b);if(u>=0&&v>=u)return{u,v};return null}
 function syncPc(){const r=pcRange(),en=S.lang==='en';
   $$('#pcT button').forEach(b=>b.classList.toggle('on',!!(r&&r.i!==undefined&&+b.dataset.t>=r.i&&+b.dataset.t<=r.j)));
   $$('#pcC button').forEach(b=>b.classList.toggle('on',!!(r&&r.c!==undefined&&+b.dataset.c===r.c)));
+  $$('#uP button').forEach(b=>b.classList.toggle('on',!!(r&&r.u!==undefined&&+b.dataset.up>=r.u&&+b.dataset.up<=r.v)));
+  $$('#uC button').forEach(b=>{const k=+b.dataset.uc;b.classList.toggle('on',!!(r&&r.u!==undefined&&r.u<=2*k&&r.v>=2*k+1))});
   let t='';
   if(r&&r.c!==undefined)t=(en?'PE slot ':'Ca ')+(r.c+1)+' · '+hm(CAHOC[r.c][0])+' – '+hm(CAHOC[r.c][1]);
+  else if(r&&r.u!==undefined)t=uInfo(r,en);
   else if(r)t=(en?'Period ':'Tiết ')+(r.i===r.j?(r.i+1):(r.i+1)+'–'+(r.j+1))+' · '+hm(TIET[r.i][0])+' – '+hm(TIET[r.j][1]);
   $('#pcInfo').textContent=t}
 function pcSet(a,b){$('#evS').value=a;$('#evE').value=b;syncPc()}
 $('#pcBox').onclick=e=>{const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.uc!==undefined){const k=+b.dataset.uc,r=pcRange();if(r&&r.u===2*k&&r.v===2*k+1)pcSet('','');else pcSet(UP[2*k][0],UP[2*k+1][1]);return}
+  if(b.dataset.up!==undefined){const n=+b.dataset.up,r=pcRange();if(!r||r.u===undefined||r.u!==r.v)pcSet(UP[n][0],UP[n][1]);else if(r.u===n)pcSet('','');else{const lo=Math.min(r.u,n),hi=Math.max(r.u,n);pcSet(UP[lo][0],UP[hi][1])}return}
   if(b.dataset.c!==undefined){const k=+b.dataset.c,r=pcRange();if(r&&r.c===k)pcSet('','');else pcSet(CAHOC[k][0],CAHOC[k][1]);return}
   const n=+b.dataset.t,r=pcRange();
   if(!r||r.c!==undefined||r.i!==r.j)pcSet(TIET[n][0],TIET[n][1]);
@@ -1335,9 +1371,9 @@ $('#sDel').onclick=()=>{SC=null;try{localStorage.removeItem('studyhub_snd')}catc
 sndUI();
 
 // ===== 2 mục: Trang chủ (vision board) / Việc & kế hoạch =====
-function showView(v){document.body.dataset.view=v;$('#home').hidden=v!=='home';$('#vision').hidden=v!=='vision';$('#board').hidden=v!=='work';$('#notes').hidden=v!=='notes';$('#focus').hidden=v!=='focus';$('#fun').hidden=v!=='fun';
+function showView(v){document.body.dataset.view=v;$('#home').hidden=v!=='home';$('#vision').hidden=v!=='vision';$('#board').hidden=v!=='work';$('#notes').hidden=v!=='notes';$('#focus').hidden=v!=='focus';$('#fun').hidden=v!=='fun';$('#tkb').hidden=v!=='tkb';
   $$('#nav button,#bnav button[data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===v));window.scrollTo(0,0);
-  if(v==='vision')requestAnimationFrame(()=>vbNorm(true));else if(v==='work')applyAll();else if(v==='notes')window.notesShow&&notesShow();else if(v==='focus')window.petShow&&petShow();else if(v==='fun')window.funShow&&funShow();else requestAnimationFrame(hmBuild)}
+  if(v==='vision')requestAnimationFrame(()=>vbNorm(true));else if(v==='work')applyAll();else if(v==='notes')window.notesShow&&notesShow();else if(v==='focus')window.petShow&&petShow();else if(v==='fun')window.funShow&&funShow();else if(v==='tkb')window.rTT&&rTT();else requestAnimationFrame(hmBuild)}
 $('#nav').onclick=e=>{const b=e.target.closest('button');if(b)showView(b.dataset.v)};
 $('#bnav').onclick=e=>{e.stopPropagation();const b=e.target.closest('button');if(!b)return;
   if(b.dataset.v)return showView(b.dataset.v);
@@ -1433,7 +1469,7 @@ function setLang(l,first){S.lang=l;document.documentElement.lang=l;$('#lang').fi
   if(!first){save();tickClock();hmBuild&&hmBuild()}}
 $('#lang').onclick=()=>setLang(S.lang==='en'?'vi':'en');
 if(S.lang==='en')setLang('en',true);
-try{[['Chọn nhanh theo tiết (bấm 1 tiết, hoặc bấm tiết đầu rồi tiết cuối)','Quick pick by period (tap one period, or tap the first then the last)'],['Giáo dục thể chất (ca học)','Physical education (slot)'],['📷 Thêm ảnh','📷 Add photos'],['✎ Thẻ chữ','✎ Text card'],['⇲ Xếp gọn','⇲ Tidy'],['Chạm giữ một ô rồi kéo để đổi chỗ · kéo góc ◢ để đổi cỡ.','Press and hold a tile, then drag to move · drag the ◢ corner to resize.']].forEach(([a,b])=>LD.set(a,b))}catch(e){}
+try{[['NEU · Chọn nhanh theo tiết (bấm 1 tiết, hoặc bấm tiết đầu rồi tiết cuối)','NEU · Quick pick by period (tap one period, or tap the first then the last)'],['NEU · Giáo dục thể chất (ca học)','NEU · Physical education (slot)'],['📷 Thêm ảnh','📷 Add photos'],['✎ Thẻ chữ','✎ Text card'],['⇲ Xếp gọn','⇲ Tidy'],['Chạm giữ một ô rồi kéo để đổi chỗ · kéo góc ◢ để đổi cỡ.','Press and hold a tile, then drag to move · drag the ◢ corner to resize.']].forEach(([a,b])=>LD.set(a,b))}catch(e){}
 
 // ===== ĐỒNG BỘ ĐÁM MÂY (Firebase Auth + Firestore) =====
 (function(){
@@ -1758,6 +1794,40 @@ setInterval(()=>{if(document.body.dataset.view!=='fun')return;
   if(game==='su'&&su.g.length&&!su.done){su.t++;$('#suT').textContent=mm(su.t)}
   if(game==='mi'&&mi.run){mi.t++;$('#miT').textContent=mm(mi.t)}},1000);
 window.funShow=()=>{if(!su.g.length){suNew();miNew();g4Go()}};
+})();
+</script>
+<script>
+/* ===== THỜI KHÓA BIỂU (chỉ sự kiện đã tick "Lịch học") ===== */
+(()=>{
+let off=0;const tm=x=>{const a=x.split(':');return +a[0]*60+ +a[1]};
+function lay(a){const L=a.filter(x=>x.s).map(x=>({x,s:tm(x.s),e:Math.max(tm(x.s)+25,x.e?tm(x.e):tm(x.s)+60)})).sort((p,q)=>p.s-q.s||p.e-q.e);
+  const out=[];let cl=[],end=0;
+  const flush=()=>{const n=Math.max(...cl.map(o=>o.l))+1;cl.forEach(o=>{o.n=n;out.push(o)});cl=[]};
+  L.forEach(o=>{if(cl.length&&o.s>=end)flush();if(!cl.length)end=0;
+    const used=cl.filter(c=>c.e>o.s).map(c=>c.l);let l=0;while(used.includes(l))l++;o.l=l;cl.push(o);end=Math.max(end,o.e)});
+  if(cl.length)flush();return out}
+window.rTT=()=>{const root=$('#tkb');if(!root||root.hidden)return;
+  const m=monday(off),days=[...Array(7)].map((_,i)=>{const d=new Date(m);d.setDate(m.getDate()+i);return d}),td=iso(new Date());
+  const per=days.map(d=>evsOn(iso(d)).filter(x=>x.l));
+  let lo=7*60,hi=18*60;
+  per.forEach(a=>a.forEach(x=>{if(x.s){lo=Math.min(lo,Math.floor(tm(x.s)/60)*60);hi=Math.max(hi,Math.ceil((x.e?tm(x.e):tm(x.s)+60)/60)*60)}}));
+  const HH=56,H=(hi-lo)/60*HH,e=days[6];
+  $('#ttLbl').textContent=days[0].getDate()+'/'+(days[0].getMonth()+1)+' – '+e.getDate()+'/'+(e.getMonth()+1);
+  let h='<div></div>'+days.map((d,i)=>`<div class="tt-h ${iso(d)===td?'today':''}">${DN[i]}<small>${d.getDate()}/${d.getMonth()+1}</small></div>`).join('');
+  h+='<div class="tt-adl">Cả ngày</div>'+per.map(a=>`<div class="tt-ad">${a.filter(x=>!x.s).map(evMini).join('')}</div>`).join('');
+  h+='<div class="tt-hr">'+[...Array((hi-lo)/60)].map((_,i)=>`<div>${pad(lo/60+i)}:00</div>`).join('')+'</div>';
+  const now=new Date(),nm=now.getHours()*60+now.getMinutes();
+  h+=days.map((d,i)=>{const k=iso(d);
+    const evs=lay(per[i]).map(o=>`<div class="tt-ev" data-ev="${o.x.id}" style="top:${(o.s-lo)/60*HH}px;height:${Math.max(18,(o.e-o.s)/60*HH-2)}px;left:calc(${o.l/o.n*100}% + 1px);width:calc(${100/o.n}% - 2px);background:${o.x.c||'#3b6ea5'}"><b>${o.x.s}${o.x.e?'–'+o.x.e:''}</b>${esc(o.x.t)}${o.x.n?'<br>'+esc(o.x.n):''}</div>`).join('');
+    const nl=k===td&&nm>=lo&&nm<=hi?`<div class="tt-now" style="top:${(nm-lo)/60*HH}px"></div>`:'';
+    return `<div class="tt-col ${k===td?'today':''}" style="height:${H}px">${evs}${nl}</div>`}).join('');
+  const g=$('#ttG');g.innerHTML=h;
+  if(!g._f){g._f=1;const w=g.parentNode;if(off===0&&w.scrollTop===0){const t=Math.max(0,(Math.min(nm,hi)-lo)/60*HH-120);w.scrollTop=t}}};
+$('#ttG').onclick=e=>{const v=e.target.closest('[data-ev]');if(v)openEv(v.dataset.ev)};
+$('#ttPrev').onclick=()=>{off--;rTT()};$('#ttNext').onclick=()=>{off++;rTT()};$('#ttNow').onclick=()=>{off=0;rTT()};
+$('#ttAdd').onclick=()=>{const d=new Date(monday(off));const t=iso(new Date());const k=off===0?t:iso(d);openEv(null,k);$('#evL').checked=true};
+setInterval(()=>rTT(),60000);
+try{[['Thời khóa biểu','Timetable'],['+ Thêm lịch học','+ Add class'],['Chỉ hiện các sự kiện đã tick “Lịch học” (kể cả sự kiện lặp lại).','Only events ticked “Class” are shown (repeating ones included).'],['📚 Đây là lịch học (hiện trong Thời khóa biểu)','📚 This is a class (shown in the Timetable)'],['UET · Ca học (bấm 1 ca = cả 2 phiên)','UET · Slot (tap one = both sessions)'],['UET · Phiên (bấm 1 phiên, hoặc phiên đầu rồi phiên cuối)','UET · Session (tap one, or first then last)'],['🗓 Thời khóa biểu','🗓 Timetable'],['TKB','Timetable']].forEach(([a,b])=>LD.set(a,b))}catch(e){}
 })();
 </script>
 </body>
