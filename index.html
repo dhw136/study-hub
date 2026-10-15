@@ -256,7 +256,7 @@ body:not([data-view=work]) #layBtn,body:not([data-view=work]) #layReset{display:
 .hm{position:relative;min-height:520px;overflow:hidden}
 .hmc{left:50%;top:50%;transform:translate(-50%,-50%);width:min(560px,88vw)}
 .hmt{position:absolute;border-radius:6px;overflow:hidden;transition:opacity .45s;box-shadow:0 4px 14px #0000001a}
-.hmt img{width:100%;height:100%;object-fit:cover;display:block}
+.hmt img{width:100%;height:100%;object-fit:cover;object-position:center;display:block}
 .hmt.tx{display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;color:#fff;font-weight:600;line-height:1.25}
 #vbGrid{border:0;background:none;min-height:420px}
 .vbstage{position:relative}
@@ -1359,13 +1359,21 @@ const hmSz=()=>S.hmSize||110,hmSec=()=>S.hmSec||4;
 const hmAM=new Map(),hmA=v=>v.k==='img'?(hmAM.get(v.id)||1):1.5;
 function hmLoad(){return Promise.all(VB.filter(v=>v.k==='img'&&!hmAM.has(v.id)).map(v=>new Promise(r=>{const i=new Image();i.onload=()=>{hmAM.set(v.id,i.naturalWidth/i.naturalHeight||1);r()};i.onerror=r;i.src=v.src})))}
 let hmTok=0;
-// xếp ảnh theo hàng, giữ đúng tỉ lệ gốc của từng ảnh (kích thước mỗi ảnh khác nhau), chừa chỗ cho đồng hồ ở giữa
-function hmLay(t,R,Q){let qi=0;const out=[];
-  if(Q.length)R.forEach(([top,bot,l,r])=>{const sw=r-l,rh=bot-top;if(rh<t*.55||sw<t*.5)return;
-    const n=Math.max(1,Math.round(rh/t)),h=rh/n;
+// xếp ảnh theo hàng, giữ đúng tỉ lệ gốc của từng ảnh, phủ kín mọi vùng quanh đồng hồ (trên, dưới, trái, phải)
+function hmBand(t,l,top,sw,rh,Q,qi){
+  if(sw<30||rh<30)return{out:[],qi,e:0};
+  const n0=Math.max(1,Math.round(rh/t));let best=null;
+  for(const n of new Set([Math.max(1,n0-1),n0,n0+1])){   // thử vài số hàng, chọn cách ít bị xén ảnh nhất
+    const h=rh/n;let q=qi,out=[],err=0,cnt=0;
     for(let i=0;i<n;i++){const acc=[];let sum=0;
-      while(acc.length<12){const v=Q[qi%Q.length],a=hmA(v);if(acc.length&&Math.abs((sum+a)*h-sw)>=Math.abs(sum*h-sw))break;acc.push([v,a]);sum+=a;qi++}
-      const k=sw/(sum*h);let x=l;acc.forEach(([v,a])=>{const w=a*h*k;out.push({x,y:top+i*h,w,h,v});x+=w})}});
+      while(acc.length<80){const v=Q[q%Q.length],a=hmA(v);if(acc.length&&Math.abs((sum+a)*h-sw)>=Math.abs(sum*h-sw))break;acc.push([v,a]);sum+=a;q++}
+      const k=sw/(sum*h);err+=Math.abs(Math.log(k))*acc.length;cnt+=acc.length;
+      let x=l;acc.forEach(([v,a])=>{const w=a*h*k;out.push({x,y:top+i*h,w,h,v});x+=w})}
+    const e=err/cnt+.15*Math.abs(Math.log(h/t));
+    if(!best||e<best.e)best={out,qi:q,e}}
+  return best}
+function hmLay(t,R,Q){let qi=0;const out=[];
+  if(Q.length)R.forEach(([top,bot,l,r])=>{const b=hmBand(t,l,top,r-l,bot-top,Q,qi);out.push(...b.out);qi=b.qi});
   return{out,used:qi}}
 async function hmBuild(){const my=++hmTok;await hmLoad();if(my!==hmTok)return;
   const st=$('#hm');st.style.height=Math.max(520,innerHeight-document.querySelector('header').offsetHeight-$('#bnav').offsetHeight)+'px';const W=st.clientWidth,H=st.clientHeight;if(!W||$('#home').hidden)return;
