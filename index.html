@@ -448,24 +448,25 @@ textarea.tx{resize:none;overflow:hidden;display:block;width:auto;font-size:14px;
 .tt-ev{position:absolute;border-radius:6px;padding:2px 5px;font-size:11px;line-height:1.25;color:#fff;overflow:hidden;cursor:pointer;border:1px solid #0003;word-break:break-word}
 .tt-ev b{display:block;font:700 10px ui-monospace,Menlo,monospace}
 .tt-now{position:absolute;left:0;right:0;height:2px;background:#e5484d;z-index:2;pointer-events:none}
-/* ===== thanh trên cùng: 1 hàng gọn (desktop) ===== */
+/* ===== thanh trên cùng: 1 hàng, mọi mục cùng cỡ (desktop) ===== */
 @media(min-width:701px){
-  header{flex-wrap:nowrap;gap:10px;padding:8px 14px;min-height:56px}
-  header h1{font-size:17px;white-space:nowrap;flex:none}
-  header nav#nav{flex:1 1 0;min-width:0;gap:2px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+  header{flex-wrap:nowrap;gap:10px;padding:10px 16px;align-items:center}
+  header h1{font-size:18px;white-space:nowrap;flex:none}
+  header nav#nav{flex:1 1 0;min-width:0;gap:4px;overflow-x:auto;scrollbar-width:none}
   header nav#nav::-webkit-scrollbar{display:none}
-  header nav#nav button{padding:7px 10px;font-size:13px;flex:none}
   .hbar{flex:none;flex-wrap:nowrap;gap:6px;justify-content:flex-end}
-  .hclk{flex-direction:row;align-items:center}
-  .hclk b{font-size:17px;letter-spacing:.5px}
-  .hclk span{display:none}
-  .htm{padding:4px 9px;gap:6px;flex:none}
-  .htm b{font-size:16px}
-  header>.row{flex-wrap:nowrap;gap:4px;flex:none}
-  header .btn{padding:6px 9px;font-size:13px;white-space:nowrap}
-  #syLbl{display:none}
+  header>.row{flex-wrap:nowrap;gap:6px;flex:none}
+  header nav#nav button,header .htm,header .hclk,header .btn{
+    box-sizing:border-box;height:36px;padding:0 12px;font:600 14px/1 var(--font);
+    display:inline-flex;flex-direction:row;align-items:center;justify-content:center;gap:6px;
+    border-radius:10px;white-space:nowrap;flex:none;text-transform:none}
+  header .htm,header .hclk{background:var(--card);border:1px solid var(--line);color:var(--ink)}
+  header .htm b,header .hclk b{font:600 14px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:0}
+  header .htm span{font-size:14px;font-weight:600;color:var(--mute)}
+  header .hclk span{display:none}
+  header .btn{min-width:36px}
 }
-@media(min-width:701px) and (max-width:1250px){.htm span{display:none}.hclk{display:none}}
+@media(min-width:701px) and (max-width:1250px){header .htm span,header .hclk{display:none}}
 .tt-ev.o{border:1px dashed #fff9;opacity:.88}
 
 </style>
@@ -482,7 +483,7 @@ textarea.tx{resize:none;overflow:hidden;display:block;width:auto;font-size:14px;
     <button class="btn ghost" id="calBtn" title="Lịch">📅</button>
   </div>
   <div class="calpop" id="calPop" hidden></div>
-  <span class="row"><button class="btn ghost" id="layReset" style="display:none">Đặt lại bố cục</button><button class="btn ghost" id="layBtn">✥ Bố cục</button><button class="btn ghost" id="syncBtn" title="Đồng bộ giữa các thiết bị">☁ <span id="syLbl">Đồng bộ</span></button><button class="btn ghost" id="lang" title="Ngôn ngữ / Language">🌐 VI</button><button class="btn ghost" id="theme" title="Cài đặt">⚙</button></span>
+  <span class="row"><button class="btn ghost" id="layReset" style="display:none">Đặt lại bố cục</button><button class="btn ghost" id="layBtn">✥ Bố cục</button><button class="btn ghost" id="theme" title="Cài đặt">⚙</button></span>
 </header>
 <nav id="bnav"><button data-v="home" class="on"><b>🏠</b><span>Trang chủ</span></button><button data-v="vision"><b>🖼</b><span>Vision</span></button><button data-v="work"><b>📋</b><span>Kế hoạch</span></button><button data-v="notes"><b>✏️</b><span>Sổ tay</span></button><button data-v="focus"><b>🐾</b><span>Học</span></button><button data-v="fun"><b>🎮</b><span>Giải trí</span></button><button data-v="tkb"><b>🗓</b><span>TKB</span></button><button data-bn="cal"><b>📅</b><span>Lịch</span></button><button data-bn="set"><b>⚙</b><span>Cài đặt</span></button></nav>
 <label class="vbfab" id="vbFab" title="Thêm ảnh">＋<input type="file" id="vbFile3" accept="image/*" multiple hidden></label>
@@ -678,6 +679,8 @@ textarea.tx{resize:none;overflow:hidden;display:block;width:auto;font-size:14px;
 </dialog>
 <dialog id="set">
   <h2 style="margin:0 0 8px">Cài đặt</h2>
+  <div class="plab">Tài khoản &amp; ngôn ngữ</div>
+  <div class="row" style="margin-bottom:10px"><button class="btn ghost" id="syncBtn" title="Đồng bộ giữa các thiết bị">☁ <span id="syLbl">Đồng bộ</span></button><button class="btn ghost" id="lang" title="Ngôn ngữ / Language">🌐 VI</button></div>
   <div class="plab">Vision board</div>
   <div class="row" style="margin-bottom:10px">
     <label class="btn ghost" style="cursor:pointer">+ Thêm ảnh<input type="file" id="vbFile" accept="image/*" multiple hidden></label>
@@ -1422,40 +1425,30 @@ const hmSz=()=>S.hmSize||110,hmSec=()=>S.hmSec||4;
 const hmAM=new Map(),hmA=v=>v.k==='img'?(hmAM.get(v.id)||1):1.5;
 function hmLoad(){return Promise.all(VB.filter(v=>v.k==='img'&&!hmAM.has(v.id)).map(v=>new Promise(r=>{const i=new Image();i.onload=()=>{hmAM.set(v.id,i.naturalWidth/i.naturalHeight||1);r()};i.onerror=r;i.src=v.src})))}
 let hmTok=0;
-// xếp ảnh theo hàng, giữ đúng tỉ lệ gốc của từng ảnh, phủ kín mọi vùng quanh đồng hồ (trên, dưới, trái, phải)
-function hmBand(t,l,top,sw,rh,Q,qi){
-  if(sw<Math.max(30,t*.5)||rh<30)return{out:[],qi,e:0};
-  const n0=Math.max(1,Math.round(rh/t));let best=null;
-  for(const n of new Set([Math.max(1,n0-1),n0,n0+1])){   // thử vài số hàng, chọn cách ít bị xén ảnh nhất
-    const h=rh/n;let q=qi,out=[],err=0,cnt=0;
-    for(let i=0;i<n;i++){const acc=[];let sum=0;
-      while(acc.length<80){const v=Q[q%Q.length],a=hmA(v);if(acc.length&&Math.abs((sum+a)*h-sw)>=Math.abs(sum*h-sw))break;acc.push([v,a]);sum+=a;q++}
-      const k=sw/(sum*h);err+=Math.abs(Math.log(k))*acc.length;cnt+=acc.length;
-      let x=l;acc.forEach(([v,a])=>{const w=a*h*k;out.push({x,y:top+i*h,w,h,v});x+=w})}
-    const e=err/cnt+.6*Math.abs(Math.log(h/t));
-    if(!best||e<best.e)best={out,qi:q,e}}
-  return best}
-function hmLay(t,R,Q){let qi=0;const out=[];
-  if(Q.length)R.forEach(([top,bot,l,r])=>{const b=hmBand(t,l,top,r-l,bot-top,Q,qi);out.push(...b.out);qi=b.qi});
-  return{out,used:qi}}
+// xếp ảnh theo hàng: mọi ảnh CÙNG độ cao, giữ đúng tỉ lệ gốc (không phóng to / cắt xén)
 async function hmBuild(){const my=++hmTok;await hmLoad();if(my!==hmTok)return;
-  const st=$('#hm');st.style.height=Math.max(520,innerHeight-document.querySelector('header').offsetHeight-$('#bnav').offsetHeight)+'px';const W=st.clientWidth,H=st.clientHeight;if(!W||$('#home').hidden)return;
-  const he=$('#hmHero'),T=$('#hmT');T.innerHTML='';hmSlots=[];
-  const x0=(W-he.offsetWidth)/2,x1=x0+he.offsetWidth,y0=(H-he.offsetHeight)/2,y1=y0+he.offsetHeight,R=[[0,y0,0,W],[y0,y1,0,x0],[y0,y1,x1,W],[y1,H,0,W]],Q=hmShuf(VB);
-  // hàng ảnh không cao hơn ~1,4 lần dải mỏng nhất để các ô to nhỏ đồng đều
-  const thin=R.map(([a,b,l,r])=>[b-a,r-l]).filter(([h,w])=>h>=70&&w>=60).map(([h])=>h),cap=thin.length?Math.max(60,Math.min(...thin)/.7):260,tMax=Math.min(260,cap);
-  let t=Math.max(50,Math.min(W/3,hmSz(),tMax)),L=hmLay(t,R,Q);
-  while(L.used>VB.length&&t<tMax){t+=10;L=hmLay(t,R,Q)}   // ít ảnh thì tự to lên để không lặp
-  L.out.slice(0,Math.max(L.out.length,0)).forEach(p=>{if(hmSlots.some(d=>d._v===p.v)&&VB.length>=L.out.length)return;
-    const d=document.createElement('div');d.className='hmt';d._v=p.v;d._a=p.w/p.h;
-    d.style.cssText=`left:${p.x+1.5}px;top:${p.y+1.5}px;width:${p.w-3}px;height:${p.h-3}px`;T.appendChild(d);hmFill(d,p.v);hmSlots.push(d)})}
+  const st=$('#hm');st.style.height=Math.max(520,innerHeight-document.querySelector('header').offsetHeight-$('#bnav').offsetHeight)+'px';
+  const W=st.clientWidth,H=st.clientHeight;if(!W||$('#home').hidden)return;
+  const he=$('#hmHero'),T=$('#hmT');T.innerHTML='';hmSlots=[];if(!VB.length)return;
+  const t=Math.max(50,Math.min(hmSz(),W/2)),G=3,pd=8,
+    x0=(W-he.offsetWidth)/2-pd,x1=(W+he.offsetWidth)/2+pd,y0=(H-he.offsetHeight)/2-pd,y1=(H+he.offsetHeight)/2+pd,
+    n=Math.max(1,Math.floor((H+G)/(t+G))),vg=n>1?(H-n*t)/(n-1):0;
+  let pool=[];const take=fit=>{if(!pool.length)pool=hmShuf(VB);
+    for(let k=0;k<Math.min(8,pool.length);k++){if(fit(hmA(pool[k])*t))return pool.splice(k,1)[0]}return null};
+  for(let i=0;i<n;i++){const y=n>1?i*(t+vg):(H-t)/2,hit=y<y1&&y+t>y0,segs=hit?[[0,x0],[x1,W]]:[[0,W]];
+    segs.forEach(([l,r])=>{const w=r-l;if(w<t*.6)return;const acc=[];let sum=0;
+      for(let g=0;g<300;g++){const v=take(wd=>sum+wd+(acc.length?G:0)<=w);if(!v)break;acc.push(v);sum+=hmA(v)*t+(acc.length>1?G:0)}
+      if(!acc.length)return;
+      const left=w-sum,gap=acc.length>1?G+left/(acc.length-1):0;let x=acc.length>1?l:l+left/2;
+      acc.forEach(v=>{const wd=hmA(v)*t,d=document.createElement('div');d.className='hmt';d._v=v;d._a=hmA(v);
+        d.style.cssText=`left:${x}px;top:${y}px;width:${wd}px;height:${t}px`;T.appendChild(d);hmFill(d,v);hmSlots.push(d);x+=wd+gap})})}}
 function hmSwap(){if(document.body.dataset.view!=='home'||!hmSlots.length)return;
-  const pool=VB.filter(v=>!hmSlots.some(d=>d._v===v)),n=Math.max(1,Math.round(hmSlots.length/10)),ch=(d,v)=>{d._v=v;d.style.opacity=0;setTimeout(()=>{hmFill(d,v);d.style.opacity=1},450)};
-  const best=(c,sc)=>c.reduce((m,x)=>sc(x)<sc(m)?x:m);
-  for(let k=0;k<n;k++){const d=hmSlots[Math.random()*hmSlots.length|0];
-    if(pool.length){const c=[...Array(Math.min(6,pool.length))].map(()=>pool[Math.random()*pool.length|0]),v=best(c,x=>Math.abs(hmA(x)-d._a));pool.splice(pool.indexOf(v),1);pool.push(d._v);ch(d,v)}
-    else if(hmSlots.length>1){const c=[...Array(6)].map(()=>hmSlots[Math.random()*hmSlots.length|0]).filter(e=>e!==d);if(!c.length)continue;
-      const e=best(c,e=>Math.abs(hmA(d._v)-e._a)+Math.abs(hmA(e._v)-d._a)),a=d._v,b=e._v;ch(d,b);ch(e,a)}}}
+  const pool=VB.filter(v=>!hmSlots.some(d=>d._v===v)),n=Math.max(1,Math.round(hmSlots.length/10)),
+    ch=(d,v)=>{d._v=v;d.style.opacity=0;setTimeout(()=>{hmFill(d,v);d.style.opacity=1},450)},ok=(a,b)=>Math.abs(a-b)<=.12*b;
+  for(let k=0;k<n;k++){const d=hmSlots[Math.random()*hmSlots.length|0],c=pool.filter(x=>ok(hmA(x),d._a));
+    if(c.length){const v=c[Math.random()*c.length|0];pool.splice(pool.indexOf(v),1);pool.push(d._v);ch(d,v)}
+    else if(hmSlots.length>1){const c2=hmSlots.filter(e=>e!==d&&ok(hmA(e._v),d._a)&&ok(hmA(d._v),e._a));if(!c2.length)continue;
+      const e=c2[Math.random()*c2.length|0],a=d._v,b=e._v;ch(d,b);ch(e,a)}}}
 (function loop(){hmSwap();setTimeout(loop,hmSec()*1000)})();
 $('#hmSz').value=hmSz();$('#hmSzV').textContent=hmSz();$('#hmSec').value=hmSec();$('#hmSecV').textContent=hmSec();
 $('#hmSz').oninput=e=>{S.hmSize=+e.target.value;$('#hmSzV').textContent=S.hmSize;save();clearTimeout(window._hb);window._hb=setTimeout(hmBuild,120)};
@@ -1854,7 +1847,7 @@ $('#ttG').onclick=e=>{const v=e.target.closest('[data-ev]');if(v)openEv(v.datase
 $('#ttPrev').onclick=()=>{off--;rTT()};$('#ttNext').onclick=()=>{off++;rTT()};$('#ttNow').onclick=()=>{off=0;rTT()};
 $('#ttAdd').onclick=()=>{const d=new Date(monday(off));const t=iso(new Date());const k=off===0?t:iso(d);openEv(null,k,true)};
 setInterval(()=>rTT(),60000);
-try{[['Thời khóa biểu','Timetable'],['+ Thêm lịch học','+ Add class'],['Lịch học thêm tại đây (nền đặc). Sự kiện thêm ở Việc & kế hoạch cũng hiện ở đây (viền nét đứt).','Classes are added here (solid). Events added in Tasks & plan also show here (dashed outline).'],['Ca học (bấm 1 ca = cả 2 phiên)','Slot (tap one = both sessions)'],['Phiên (bấm 1 phiên, hoặc phiên đầu rồi phiên cuối)','Session (tap one, or first then last)'],['Thêm lịch học','Add class'],['Sửa lịch học','Edit class'],['🗓 Thời khóa biểu','🗓 Timetable'],['TKB','Timetable']].forEach(([a,b])=>LD.set(a,b))}catch(e){}
+try{[['Thời khóa biểu','Timetable'],['Tài khoản & ngôn ngữ','Account & language'],['+ Thêm lịch học','+ Add class'],['Lịch học thêm tại đây (nền đặc). Sự kiện thêm ở Việc & kế hoạch cũng hiện ở đây (viền nét đứt).','Classes are added here (solid). Events added in Tasks & plan also show here (dashed outline).'],['Ca học (bấm 1 ca = cả 2 phiên)','Slot (tap one = both sessions)'],['Phiên (bấm 1 phiên, hoặc phiên đầu rồi phiên cuối)','Session (tap one, or first then last)'],['Thêm lịch học','Add class'],['Sửa lịch học','Edit class'],['🗓 Thời khóa biểu','🗓 Timetable'],['TKB','Timetable']].forEach(([a,b])=>LD.set(a,b))}catch(e){}
 })();
 </script>
 </body>
