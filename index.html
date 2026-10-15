@@ -467,6 +467,7 @@ textarea.tx{resize:none;overflow:hidden;display:block;width:auto;font-size:14px;
   header .btn{min-width:36px}
 }
 @media(min-width:701px) and (max-width:1250px){header .htm span,header .hclk{display:none}}
+#hmHero{display:flex;flex-direction:column;justify-content:center}
 .tt-ev.o{border:1px dashed #fff9;opacity:.88}
 
 </style>
@@ -1425,23 +1426,27 @@ const hmSz=()=>S.hmSize||110,hmSec=()=>S.hmSec||4;
 const hmAM=new Map(),hmA=v=>v.k==='img'?(hmAM.get(v.id)||1):1.5;
 function hmLoad(){return Promise.all(VB.filter(v=>v.k==='img'&&!hmAM.has(v.id)).map(v=>new Promise(r=>{const i=new Image();i.onload=()=>{hmAM.set(v.id,i.naturalWidth/i.naturalHeight||1);r()};i.onerror=r;i.src=v.src})))}
 let hmTok=0;
-// xếp ảnh theo hàng: mọi ảnh CÙNG độ cao, giữ đúng tỉ lệ gốc (không phóng to / cắt xén)
+// xếp ảnh khít: mọi hàng CÙNG độ cao, mỗi hàng được lấp kín mép-trái → mép-phải (kể cả 2 bên khung đồng hồ)
 async function hmBuild(){const my=++hmTok;await hmLoad();if(my!==hmTok)return;
   const st=$('#hm');st.style.height=Math.max(520,innerHeight-document.querySelector('header').offsetHeight-$('#bnav').offsetHeight)+'px';
   const W=st.clientWidth,H=st.clientHeight;if(!W||$('#home').hidden)return;
-  const he=$('#hmHero'),T=$('#hmT');T.innerHTML='';hmSlots=[];if(!VB.length)return;
-  const t=Math.max(50,Math.min(hmSz(),W/2)),G=3,pd=8,
-    x0=(W-he.offsetWidth)/2-pd,x1=(W+he.offsetWidth)/2+pd,y0=(H-he.offsetHeight)/2-pd,y1=(H+he.offsetHeight)/2+pd,
-    n=Math.max(1,Math.floor((H+G)/(t+G))),vg=n>1?(H-n*t)/(n-1):0;
-  let pool=[];const take=fit=>{if(!pool.length)pool=hmShuf(VB);
-    for(let k=0;k<Math.min(8,pool.length);k++){if(fit(hmA(pool[k])*t))return pool.splice(k,1)[0]}return null};
-  for(let i=0;i<n;i++){const y=n>1?i*(t+vg):(H-t)/2,hit=y<y1&&y+t>y0,segs=hit?[[0,x0],[x1,W]]:[[0,W]];
-    segs.forEach(([l,r])=>{const w=r-l;if(w<t*.6)return;const acc=[];let sum=0;
-      for(let g=0;g<300;g++){const v=take(wd=>sum+wd+(acc.length?G:0)<=w);if(!v)break;acc.push(v);sum+=hmA(v)*t+(acc.length>1?G:0)}
-      if(!acc.length)return;
-      const left=w-sum,gap=acc.length>1?G+left/(acc.length-1):0;let x=acc.length>1?l:l+left/2;
-      acc.forEach(v=>{const wd=hmA(v)*t,d=document.createElement('div');d.className='hmt';d._v=v;d._a=hmA(v);
-        d.style.cssText=`left:${x}px;top:${y}px;width:${wd}px;height:${t}px`;T.appendChild(d);hmFill(d,v);hmSlots.push(d);x+=wd+gap})})}}
+  const he=$('#hmHero'),T=$('#hmT');T.innerHTML='';hmSlots=[];
+  he.style.top='';he.style.height='';he.style.transform='';
+  if(!VB.length)return;
+  const t=Math.max(50,Math.min(hmSz(),W/2)),G=3,n=Math.max(1,Math.round(H/t)),h=H/n,hw=he.offsetWidth,hh=he.offsetHeight;
+  let m=Math.min(n,Math.max(1,Math.ceil((hh+2*G)/h)));if((n-m)%2)m++;   // khung giữa chiếm m hàng, cân đối trên/dưới
+  const a=(n-m)/2,x0=(W-hw)/2-G,x1=(W+hw)/2+G;
+  let pool=[];
+  const seg=(l,r,y)=>{const w=r-l;if(w<h*.6)return;const acc=[];let sum=0;
+    for(let g=0;g<300;g++){if(!pool.length)pool=hmShuf(VB);let bi=0,bc=1e9;
+      for(let k=0;k<Math.min(8,pool.length);k++){const c=Math.abs((sum+hmA(pool[k]))*h-w);if(c<bc){bc=c;bi=k}}
+      if(acc.length&&bc>=Math.abs(sum*h-w))break;
+      sum+=hmA(pool[bi]);acc.push(pool.splice(bi,1)[0])}
+    const k=w/(sum*h);let x=l;
+    acc.forEach(v=>{const wd=hmA(v)*h*k,d=document.createElement('div');d.className='hmt';d._v=v;d._a=wd/h;
+      d.style.cssText=`left:${x+1.5}px;top:${y+1.5}px;width:${wd-3}px;height:${h-3}px`;T.appendChild(d);hmFill(d,v);hmSlots.push(d);x+=wd})};
+  for(let i=0;i<n;i++){const y=i*h;if(i>=a&&i<a+m){seg(0,x0,y);seg(x1,W,y)}else seg(0,W,y)}
+  he.style.top=(a*h+G)+'px';he.style.height=(m*h-2*G)+'px';he.style.transform='translateX(-50%)'}
 function hmSwap(){if(document.body.dataset.view!=='home'||!hmSlots.length)return;
   const pool=VB.filter(v=>!hmSlots.some(d=>d._v===v)),n=Math.max(1,Math.round(hmSlots.length/10)),
     ch=(d,v)=>{d._v=v;d.style.opacity=0;setTimeout(()=>{hmFill(d,v);d.style.opacity=1},450)},ok=(a,b)=>Math.abs(a-b)<=.12*b;
