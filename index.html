@@ -1361,7 +1361,7 @@ function hmLoad(){return Promise.all(VB.filter(v=>v.k==='img'&&!hmAM.has(v.id)).
 let hmTok=0;
 // xếp ảnh theo hàng, giữ đúng tỉ lệ gốc của từng ảnh, phủ kín mọi vùng quanh đồng hồ (trên, dưới, trái, phải)
 function hmBand(t,l,top,sw,rh,Q,qi){
-  if(sw<30||rh<30)return{out:[],qi,e:0};
+  if(sw<Math.max(30,t*.5)||rh<30)return{out:[],qi,e:0};
   const n0=Math.max(1,Math.round(rh/t));let best=null;
   for(const n of new Set([Math.max(1,n0-1),n0,n0+1])){   // thử vài số hàng, chọn cách ít bị xén ảnh nhất
     const h=rh/n;let q=qi,out=[],err=0,cnt=0;
@@ -1369,7 +1369,7 @@ function hmBand(t,l,top,sw,rh,Q,qi){
       while(acc.length<80){const v=Q[q%Q.length],a=hmA(v);if(acc.length&&Math.abs((sum+a)*h-sw)>=Math.abs(sum*h-sw))break;acc.push([v,a]);sum+=a;q++}
       const k=sw/(sum*h);err+=Math.abs(Math.log(k))*acc.length;cnt+=acc.length;
       let x=l;acc.forEach(([v,a])=>{const w=a*h*k;out.push({x,y:top+i*h,w,h,v});x+=w})}
-    const e=err/cnt+.15*Math.abs(Math.log(h/t));
+    const e=err/cnt+.6*Math.abs(Math.log(h/t));
     if(!best||e<best.e)best={out,qi:q,e}}
   return best}
 function hmLay(t,R,Q){let qi=0;const out=[];
@@ -1379,8 +1379,10 @@ async function hmBuild(){const my=++hmTok;await hmLoad();if(my!==hmTok)return;
   const st=$('#hm');st.style.height=Math.max(520,innerHeight-document.querySelector('header').offsetHeight-$('#bnav').offsetHeight)+'px';const W=st.clientWidth,H=st.clientHeight;if(!W||$('#home').hidden)return;
   const he=$('#hmHero'),T=$('#hmT');T.innerHTML='';hmSlots=[];
   const x0=(W-he.offsetWidth)/2,x1=x0+he.offsetWidth,y0=(H-he.offsetHeight)/2,y1=y0+he.offsetHeight,R=[[0,y0,0,W],[y0,y1,0,x0],[y0,y1,x1,W],[y1,H,0,W]],Q=hmShuf(VB);
-  let t=Math.max(50,Math.min(W/3,hmSz())),L=hmLay(t,R,Q);
-  while(L.used>VB.length&&t<260){t+=10;L=hmLay(t,R,Q)}   // ít ảnh thì tự to lên để không lặp
+  // hàng ảnh không cao hơn ~1,4 lần dải mỏng nhất để các ô to nhỏ đồng đều
+  const thin=R.map(([a,b,l,r])=>[b-a,r-l]).filter(([h,w])=>h>=70&&w>=60).map(([h])=>h),cap=thin.length?Math.max(60,Math.min(...thin)/.7):260,tMax=Math.min(260,cap);
+  let t=Math.max(50,Math.min(W/3,hmSz(),tMax)),L=hmLay(t,R,Q);
+  while(L.used>VB.length&&t<tMax){t+=10;L=hmLay(t,R,Q)}   // ít ảnh thì tự to lên để không lặp
   L.out.slice(0,Math.max(L.out.length,0)).forEach(p=>{if(hmSlots.some(d=>d._v===p.v)&&VB.length>=L.out.length)return;
     const d=document.createElement('div');d.className='hmt';d._v=p.v;d._a=p.w/p.h;
     d.style.cssText=`left:${p.x+1.5}px;top:${p.y+1.5}px;width:${p.w-3}px;height:${p.h-3}px`;T.appendChild(d);hmFill(d,p.v);hmSlots.push(d)})}
