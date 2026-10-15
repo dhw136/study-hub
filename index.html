@@ -448,6 +448,26 @@ textarea.tx{resize:none;overflow:hidden;display:block;width:auto;font-size:14px;
 .tt-ev{position:absolute;border-radius:6px;padding:2px 5px;font-size:11px;line-height:1.25;color:#fff;overflow:hidden;cursor:pointer;border:1px solid #0003;word-break:break-word}
 .tt-ev b{display:block;font:700 10px ui-monospace,Menlo,monospace}
 .tt-now{position:absolute;left:0;right:0;height:2px;background:#e5484d;z-index:2;pointer-events:none}
+/* ===== thanh trên cùng: 1 hàng gọn (desktop) ===== */
+@media(min-width:701px){
+  header{flex-wrap:nowrap;gap:10px;padding:8px 14px;min-height:56px}
+  header h1{font-size:17px;white-space:nowrap;flex:none}
+  header nav#nav{flex:1 1 0;min-width:0;gap:2px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+  header nav#nav::-webkit-scrollbar{display:none}
+  header nav#nav button{padding:7px 10px;font-size:13px;flex:none}
+  .hbar{flex:none;flex-wrap:nowrap;gap:6px;justify-content:flex-end}
+  .hclk{flex-direction:row;align-items:center}
+  .hclk b{font-size:17px;letter-spacing:.5px}
+  .hclk span{display:none}
+  .htm{padding:4px 9px;gap:6px;flex:none}
+  .htm b{font-size:16px}
+  header>.row{flex-wrap:nowrap;gap:4px;flex:none}
+  header .btn{padding:6px 9px;font-size:13px;white-space:nowrap}
+  #syLbl{display:none}
+}
+@media(min-width:701px) and (max-width:1250px){.htm span{display:none}.hclk{display:none}}
+.tt-ev.o{border:1px dashed #fff9;opacity:.88}
+
 </style>
 </head>
 <body>
@@ -459,10 +479,10 @@ textarea.tx{resize:none;overflow:hidden;display:block;width:auto;font-size:14px;
     <button class="htm" id="hTm" title="Bộ đếm giờ — bấm để cuộn tới"><span id="hTmL">Pomodoro</span><b id="hT">25:00</b></button>
     <button class="htm" id="hCoinB" title="Xu kiếm được — bấm để vào trang thú cưng">🪙 <b id="hCoin">0</b></button>
     <button class="btn ghost" id="pipH" title="Bộ đếm giờ dạng bong bóng nổi (Picture-in-Picture)">🫧</button>
-    <button class="btn ghost" id="calBtn">📅 Lịch</button>
+    <button class="btn ghost" id="calBtn" title="Lịch">📅</button>
   </div>
   <div class="calpop" id="calPop" hidden></div>
-  <span class="row"><button class="btn ghost" id="layReset" style="display:none">Đặt lại bố cục</button><button class="btn ghost" id="layBtn">✥ Bố cục</button><button class="btn ghost" id="syncBtn" title="Đồng bộ giữa các thiết bị">☁ <span id="syLbl">Đồng bộ</span></button><button class="btn ghost" id="lang" title="Ngôn ngữ / Language">🌐 VI</button><button class="btn ghost" id="theme">⚙ Cài đặt</button></span>
+  <span class="row"><button class="btn ghost" id="layReset" style="display:none">Đặt lại bố cục</button><button class="btn ghost" id="layBtn">✥ Bố cục</button><button class="btn ghost" id="syncBtn" title="Đồng bộ giữa các thiết bị">☁ <span id="syLbl">Đồng bộ</span></button><button class="btn ghost" id="lang" title="Ngôn ngữ / Language">🌐 VI</button><button class="btn ghost" id="theme" title="Cài đặt">⚙</button></span>
 </header>
 <nav id="bnav"><button data-v="home" class="on"><b>🏠</b><span>Trang chủ</span></button><button data-v="vision"><b>🖼</b><span>Vision</span></button><button data-v="work"><b>📋</b><span>Kế hoạch</span></button><button data-v="notes"><b>✏️</b><span>Sổ tay</span></button><button data-v="focus"><b>🐾</b><span>Học</span></button><button data-v="fun"><b>🎮</b><span>Giải trí</span></button><button data-v="tkb"><b>🗓</b><span>TKB</span></button><button data-bn="cal"><b>📅</b><span>Lịch</span></button><button data-bn="set"><b>⚙</b><span>Cài đặt</span></button></nav>
 <label class="vbfab" id="vbFab" title="Thêm ảnh">＋<input type="file" id="vbFile3" accept="image/*" multiple hidden></label>
@@ -579,7 +599,7 @@ textarea.tx{resize:none;overflow:hidden;display:block;width:auto;font-size:14px;
 </div></main>
 <main id="tkb" hidden><div class="card">
   <div class="tt-bar"><h2 style="margin:0" class="grow">🗓 Thời khóa biểu</h2><button class="btn ghost" id="ttPrev">‹</button><b id="ttLbl" style="min-width:110px;text-align:center"></b><button class="btn ghost" id="ttNext">›</button><button class="btn ghost" id="ttNow">Tuần này</button><button class="btn" id="ttAdd">+ Thêm lịch học</button></div>
-  <div class="mute" style="margin-bottom:8px">Chỉ hiện các sự kiện đã tick “Lịch học” (kể cả sự kiện lặp lại).</div>
+  <div class="mute" style="margin-bottom:8px">Lịch học thêm tại đây (nền đặc). Sự kiện thêm ở Việc &amp; kế hoạch cũng hiện ở đây (viền nét đứt).</div>
   <div class="tt-wrap"><div class="tt-g" id="ttG"></div></div>
 </div></main>
 <main id="fun" hidden><div class="card">
@@ -615,15 +635,20 @@ textarea.tx{resize:none;overflow:hidden;display:block;width:auto;font-size:14px;
   <h2 id="evH" style="margin:0 0 8px">Thêm lịch trình</h2>
   <label>Tiêu đề</label><input id="evT" placeholder="Ví dụ: Học Toán, Khám răng, Đi chơi…">
   <label>Ngày</label><input type="date" id="evD">
-  <div id="pcBox">
-    <div class="pl">NEU · Chọn nhanh theo tiết (bấm 1 tiết, hoặc bấm tiết đầu rồi tiết cuối)</div>
-    <div class="pr" id="pcT"></div>
-    <div class="pl">NEU · Giáo dục thể chất (ca học)</div>
-    <div class="pr" id="pcC"></div>
-    <div class="pl">UET · Ca học (bấm 1 ca = cả 2 phiên)</div>
-    <div class="pr" id="uC"></div>
-    <div class="pl">UET · Phiên (bấm 1 phiên, hoặc phiên đầu rồi phiên cuối)</div>
-    <div class="pr" id="uP"></div>
+  <div id="pcBox" hidden>
+    <div class="seg" id="pcTab"><button type="button" data-k="neu" class="on">NEU</button><button type="button" data-k="uet">UET</button></div>
+    <div id="pcNeu">
+      <div class="pl">Chọn nhanh theo tiết (bấm 1 tiết, hoặc bấm tiết đầu rồi tiết cuối)</div>
+      <div class="pr" id="pcT"></div>
+      <div class="pl">Giáo dục thể chất (ca học)</div>
+      <div class="pr" id="pcC"></div>
+    </div>
+    <div id="pcUet" hidden>
+      <div class="pl">Ca học (bấm 1 ca = cả 2 phiên)</div>
+      <div class="pr" id="uC"></div>
+      <div class="pl">Phiên (bấm 1 phiên, hoặc phiên đầu rồi phiên cuối)</div>
+      <div class="pr" id="uP"></div>
+    </div>
     <div class="mute" id="pcInfo" style="min-height:20px"></div>
   </div>
   <div class="row"><div class="grow"><label>Từ giờ</label><input type="time" id="evS"></div><div class="grow"><label>Đến giờ</label><input type="time" id="evE"></div></div>
@@ -631,7 +656,6 @@ textarea.tx{resize:none;overflow:hidden;display:block;width:auto;font-size:14px;
   <div class="row"><div class="grow"><label>Lặp lại</label><select id="evR"><option value="none">Không lặp</option><option value="day">Hằng ngày</option><option value="week">Hằng tuần (cùng thứ)</option><option value="month">Hằng tháng (cùng ngày)</option></select></div><div class="grow"><label>Màu</label><input type="color" id="evC"></div></div>
   <label>Lặp đến ngày (tuỳ chọn)</label><input type="date" id="evU">
   <label>Ghi chú / địa điểm</label><input id="evN">
-  <label style="display:flex;gap:8px;align-items:center;color:var(--ink);margin-top:10px"><input type="checkbox" id="evL" style="width:auto"> 📚 Đây là lịch học (hiện trong Thời khóa biểu)</label>
   <div class="row" style="margin-top:14px"><button class="btn del" id="evDel">Xoá</button><span class="grow"></span><button class="btn ghost" id="evCancel">Huỷ</button><button class="btn" id="evSave">Lưu</button></div>
 </dialog>
 <dialog id="syncdlg">
@@ -1072,15 +1096,15 @@ const evsOn=k=>S.events.filter(x=>occ(x,k)).sort((a,b)=>(a.s||'')<(b.s||'')?-1:(
 const evTm=x=>x.s?(x.e?x.s+'–'+x.e:x.s):'Cả ngày';
 const evLine=x=>`<div class="evr" data-ev="${x.id}" style="--ec:${x.c||'#3b6ea5'}"><b>${evTm(x)}</b><span>${esc(x.t)}</span>${x.n?`<small class="mute">${esc(x.n)}</small>`:''}${x.r&&x.r!=='none'?'<small class="mute">↻</small>':''}</div>`;
 const evMini=x=>`<div class="pev" data-ev="${x.id}" style="border-color:${x.c||'#3b6ea5'}">${x.s?`<b>${x.s}</b> `:''}${esc(x.t)}</div>`;
-let evId=null;
-function openEv(id,date){evId=id;const x=id?evBy(id):{t:'',d:date||tDay,s:'',e:'',c:'#3b6ea5',r:'none',u:'',n:'',l:0};if(!x)return;
-  $('#evT').value=x.t;$('#evD').value=x.d;$('#evS').value=x.s||'';$('#evE').value=x.e||'';$('#evC').value=x.c||'#3b6ea5';$('#evR').value=x.r||'none';$('#evU').value=x.u||'';$('#evN').value=x.n||'';$('#evL').checked=!!x.l;
-  $('#evDel').style.display=id?'':'none';$('#evH').textContent=id?'Sửa lịch trình':'Thêm lịch trình';
-  syncPc();if(!$('#evdlg').open)$('#evdlg').showModal();if(!id)$('#evT').focus()}
+let evId=null,evIsL=false;
+function openEv(id,date,cls){evId=id;const x=id?evBy(id):{t:'',d:date||tDay,s:'',e:'',c:'#3b6ea5',r:'none',u:'',n:'',l:cls?1:0};if(!x)return;
+  $('#evT').value=x.t;$('#evD').value=x.d;$('#evS').value=x.s||'';$('#evE').value=x.e||'';$('#evC').value=x.c||'#3b6ea5';$('#evR').value=x.r||'none';$('#evU').value=x.u||'';$('#evN').value=x.n||'';evIsL=!!x.l;$('#pcBox').hidden=!evIsL;
+  $('#evDel').style.display=id?'':'none';$('#evH').textContent=id?(evIsL?'Sửa lịch học':'Sửa lịch trình'):(evIsL?'Thêm lịch học':'Thêm lịch trình');
+  syncPc();pcAuto();if(!$('#evdlg').open)$('#evdlg').showModal();if(!id)$('#evT').focus()}
 function evRefresh(){rPlan();rHev();if(!$('#calPop').hidden)rCal();window.rTT&&rTT()}
 $('#evSave').onclick=()=>{const t=$('#evT').value.trim(),d=$('#evD').value;if(!t){$('#evT').focus();return}if(!d){$('#evD').focus();return}
   const a=$('#evS').value,b=$('#evE').value;if(a&&b&&b<a){alert('Giờ kết thúc phải sau giờ bắt đầu');return}
-  const o={t,d,s:a,e:b,c:$('#evC').value,r:$('#evR').value,u:$('#evU').value,n:$('#evN').value.trim(),l:$('#evL').checked?1:0};
+  const o={t,d,s:a,e:b,c:$('#evC').value,r:$('#evR').value,u:$('#evU').value,n:$('#evN').value.trim(),l:evIsL?1:0};
   if(evId&&evBy(evId))Object.assign(evBy(evId),o);else S.events.push(Object.assign({id:uid()},o));
   save();$('#evdlg').close();evRefresh()};
 $('#evDel').onclick=()=>{const x=evBy(evId);if(!x)return;if(x.r&&x.r!=='none'&&!confirm('Xoá cả chuỗi lặp lại này?'))return;S.events=S.events.filter(z=>z.id!==evId);save();$('#evdlg').close();evRefresh()};
@@ -1107,12 +1131,15 @@ function syncPc(){const r=pcRange(),en=S.lang==='en';
   $$('#uP button').forEach(b=>b.classList.toggle('on',!!(r&&r.u!==undefined&&+b.dataset.up>=r.u&&+b.dataset.up<=r.v)));
   $$('#uC button').forEach(b=>{const k=+b.dataset.uc;b.classList.toggle('on',!!(r&&r.u!==undefined&&r.u<=2*k&&r.v>=2*k+1))});
   let t='';
-  if(r&&r.c!==undefined)t=(en?'PE slot ':'Ca ')+(r.c+1)+' · '+hm(CAHOC[r.c][0])+' – '+hm(CAHOC[r.c][1]);
+  if(r&&r.c!==undefined)t='NEU · '+(en?'PE slot ':'Ca ')+(r.c+1)+' · '+hm(CAHOC[r.c][0])+' – '+hm(CAHOC[r.c][1]);
   else if(r&&r.u!==undefined)t=uInfo(r,en);
-  else if(r)t=(en?'Period ':'Tiết ')+(r.i===r.j?(r.i+1):(r.i+1)+'–'+(r.j+1))+' · '+hm(TIET[r.i][0])+' – '+hm(TIET[r.j][1]);
+  else if(r)t='NEU · '+(en?'Period ':'Tiết ')+(r.i===r.j?(r.i+1):(r.i+1)+'–'+(r.j+1))+' · '+hm(TIET[r.i][0])+' – '+hm(TIET[r.j][1]);
   $('#pcInfo').textContent=t}
+function pcTab(k){$('#pcNeu').hidden=k!=='neu';$('#pcUet').hidden=k!=='uet';$$('#pcTab button').forEach(b=>b.classList.toggle('on',b.dataset.k===k))}
+function pcAuto(){const r=pcRange();pcTab(r&&r.u!==undefined?'uet':'neu')}
 function pcSet(a,b){$('#evS').value=a;$('#evE').value=b;syncPc()}
 $('#pcBox').onclick=e=>{const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.k){pcTab(b.dataset.k);return}
   if(b.dataset.uc!==undefined){const k=+b.dataset.uc,r=pcRange();if(r&&r.u===2*k&&r.v===2*k+1)pcSet('','');else pcSet(UP[2*k][0],UP[2*k+1][1]);return}
   if(b.dataset.up!==undefined){const n=+b.dataset.up,r=pcRange();if(!r||r.u===undefined||r.u!==r.v)pcSet(UP[n][0],UP[n][1]);else if(r.u===n)pcSet('','');else{const lo=Math.min(r.u,n),hi=Math.max(r.u,n);pcSet(UP[lo][0],UP[hi][1])}return}
   if(b.dataset.c!==undefined){const k=+b.dataset.c,r=pcRange();if(r&&r.c===k)pcSet('','');else pcSet(CAHOC[k][0],CAHOC[k][1]);return}
@@ -1469,7 +1496,7 @@ function setLang(l,first){S.lang=l;document.documentElement.lang=l;$('#lang').fi
   if(!first){save();tickClock();hmBuild&&hmBuild()}}
 $('#lang').onclick=()=>setLang(S.lang==='en'?'vi':'en');
 if(S.lang==='en')setLang('en',true);
-try{[['NEU · Chọn nhanh theo tiết (bấm 1 tiết, hoặc bấm tiết đầu rồi tiết cuối)','NEU · Quick pick by period (tap one period, or tap the first then the last)'],['NEU · Giáo dục thể chất (ca học)','NEU · Physical education (slot)'],['📷 Thêm ảnh','📷 Add photos'],['✎ Thẻ chữ','✎ Text card'],['⇲ Xếp gọn','⇲ Tidy'],['Chạm giữ một ô rồi kéo để đổi chỗ · kéo góc ◢ để đổi cỡ.','Press and hold a tile, then drag to move · drag the ◢ corner to resize.']].forEach(([a,b])=>LD.set(a,b))}catch(e){}
+try{[['Chọn nhanh theo tiết (bấm 1 tiết, hoặc bấm tiết đầu rồi tiết cuối)','Quick pick by period (tap one period, or tap the first then the last)'],['Giáo dục thể chất (ca học)','Physical education (slot)'],['📷 Thêm ảnh','📷 Add photos'],['✎ Thẻ chữ','✎ Text card'],['⇲ Xếp gọn','⇲ Tidy'],['Chạm giữ một ô rồi kéo để đổi chỗ · kéo góc ◢ để đổi cỡ.','Press and hold a tile, then drag to move · drag the ◢ corner to resize.']].forEach(([a,b])=>LD.set(a,b))}catch(e){}
 
 // ===== ĐỒNG BỘ ĐÁM MÂY (Firebase Auth + Firestore) =====
 (function(){
@@ -1808,7 +1835,7 @@ function lay(a){const L=a.filter(x=>x.s).map(x=>({x,s:tm(x.s),e:Math.max(tm(x.s)
   if(cl.length)flush();return out}
 window.rTT=()=>{const root=$('#tkb');if(!root||root.hidden)return;
   const m=monday(off),days=[...Array(7)].map((_,i)=>{const d=new Date(m);d.setDate(m.getDate()+i);return d}),td=iso(new Date());
-  const per=days.map(d=>evsOn(iso(d)).filter(x=>x.l));
+  const per=days.map(d=>evsOn(iso(d)));
   let lo=7*60,hi=18*60;
   per.forEach(a=>a.forEach(x=>{if(x.s){lo=Math.min(lo,Math.floor(tm(x.s)/60)*60);hi=Math.max(hi,Math.ceil((x.e?tm(x.e):tm(x.s)+60)/60)*60)}}));
   const HH=56,H=(hi-lo)/60*HH,e=days[6];
@@ -1818,16 +1845,16 @@ window.rTT=()=>{const root=$('#tkb');if(!root||root.hidden)return;
   h+='<div class="tt-hr">'+[...Array((hi-lo)/60)].map((_,i)=>`<div>${pad(lo/60+i)}:00</div>`).join('')+'</div>';
   const now=new Date(),nm=now.getHours()*60+now.getMinutes();
   h+=days.map((d,i)=>{const k=iso(d);
-    const evs=lay(per[i]).map(o=>`<div class="tt-ev" data-ev="${o.x.id}" style="top:${(o.s-lo)/60*HH}px;height:${Math.max(18,(o.e-o.s)/60*HH-2)}px;left:calc(${o.l/o.n*100}% + 1px);width:calc(${100/o.n}% - 2px);background:${o.x.c||'#3b6ea5'}"><b>${o.x.s}${o.x.e?'–'+o.x.e:''}</b>${esc(o.x.t)}${o.x.n?'<br>'+esc(o.x.n):''}</div>`).join('');
+    const evs=lay(per[i]).map(o=>`<div class="tt-ev ${o.x.l?'':'o'}" data-ev="${o.x.id}" style="top:${(o.s-lo)/60*HH}px;height:${Math.max(18,(o.e-o.s)/60*HH-2)}px;left:calc(${o.l/o.n*100}% + 1px);width:calc(${100/o.n}% - 2px);background:${o.x.c||'#3b6ea5'}"><b>${o.x.s}${o.x.e?'–'+o.x.e:''}</b>${esc(o.x.t)}${o.x.n?'<br>'+esc(o.x.n):''}</div>`).join('');
     const nl=k===td&&nm>=lo&&nm<=hi?`<div class="tt-now" style="top:${(nm-lo)/60*HH}px"></div>`:'';
     return `<div class="tt-col ${k===td?'today':''}" style="height:${H}px">${evs}${nl}</div>`}).join('');
   const g=$('#ttG');g.innerHTML=h;
   if(!g._f){g._f=1;const w=g.parentNode;if(off===0&&w.scrollTop===0){const t=Math.max(0,(Math.min(nm,hi)-lo)/60*HH-120);w.scrollTop=t}}};
 $('#ttG').onclick=e=>{const v=e.target.closest('[data-ev]');if(v)openEv(v.dataset.ev)};
 $('#ttPrev').onclick=()=>{off--;rTT()};$('#ttNext').onclick=()=>{off++;rTT()};$('#ttNow').onclick=()=>{off=0;rTT()};
-$('#ttAdd').onclick=()=>{const d=new Date(monday(off));const t=iso(new Date());const k=off===0?t:iso(d);openEv(null,k);$('#evL').checked=true};
+$('#ttAdd').onclick=()=>{const d=new Date(monday(off));const t=iso(new Date());const k=off===0?t:iso(d);openEv(null,k,true)};
 setInterval(()=>rTT(),60000);
-try{[['Thời khóa biểu','Timetable'],['+ Thêm lịch học','+ Add class'],['Chỉ hiện các sự kiện đã tick “Lịch học” (kể cả sự kiện lặp lại).','Only events ticked “Class” are shown (repeating ones included).'],['📚 Đây là lịch học (hiện trong Thời khóa biểu)','📚 This is a class (shown in the Timetable)'],['UET · Ca học (bấm 1 ca = cả 2 phiên)','UET · Slot (tap one = both sessions)'],['UET · Phiên (bấm 1 phiên, hoặc phiên đầu rồi phiên cuối)','UET · Session (tap one, or first then last)'],['🗓 Thời khóa biểu','🗓 Timetable'],['TKB','Timetable']].forEach(([a,b])=>LD.set(a,b))}catch(e){}
+try{[['Thời khóa biểu','Timetable'],['+ Thêm lịch học','+ Add class'],['Lịch học thêm tại đây (nền đặc). Sự kiện thêm ở Việc & kế hoạch cũng hiện ở đây (viền nét đứt).','Classes are added here (solid). Events added in Tasks & plan also show here (dashed outline).'],['Ca học (bấm 1 ca = cả 2 phiên)','Slot (tap one = both sessions)'],['Phiên (bấm 1 phiên, hoặc phiên đầu rồi phiên cuối)','Session (tap one, or first then last)'],['Thêm lịch học','Add class'],['Sửa lịch học','Edit class'],['🗓 Thời khóa biểu','🗓 Timetable'],['TKB','Timetable']].forEach(([a,b])=>LD.set(a,b))}catch(e){}
 })();
 </script>
 </body>
