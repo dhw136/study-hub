@@ -1426,30 +1426,40 @@ const hmSz=()=>S.hmSize||110,hmSec=()=>S.hmSec||4;
 const hmAM=new Map(),hmA=v=>v.k==='img'?(hmAM.get(v.id)||1):1.5;
 function hmLoad(){return Promise.all(VB.filter(v=>v.k==='img'&&!hmAM.has(v.id)).map(v=>new Promise(r=>{const i=new Image();i.onload=()=>{hmAM.set(v.id,i.naturalWidth/i.naturalHeight||1);r()};i.onerror=r;i.src=v.src})))}
 let hmTok=0;
-// xếp ảnh khít: mọi hàng CÙNG độ cao, mỗi hàng được lấp kín mép-trái → mép-phải (kể cả 2 bên khung đồng hồ)
+// xếp ảnh theo hàng, cỡ ngẫu nhiên, lấp kín, ưu tiên không lặp ảnh
 async function hmBuild(){const my=++hmTok;await hmLoad();if(my!==hmTok)return;
   const st=$('#hm');st.style.height=Math.max(520,innerHeight-document.querySelector('header').offsetHeight-$('#bnav').offsetHeight)+'px';
   const W=st.clientWidth,H=st.clientHeight;if(!W||$('#home').hidden)return;
   const he=$('#hmHero'),T=$('#hmT');T.innerHTML='';hmSlots=[];
   he.style.top='';he.style.height='';he.style.transform='';
   if(!VB.length)return;
-  const t=Math.max(50,Math.min(hmSz(),W/2)),G=3,n=Math.max(1,Math.round(H/t)),h=H/n,hw=he.offsetWidth,hh=he.offsetHeight;
-  let m=Math.min(n,Math.max(1,Math.ceil((hh+2*G)/h)));if((n-m)%2)m++;   // khung giữa chiếm m hàng, cân đối trên/dưới
-  const a=(n-m)/2,x0=(W-hw)/2-G,x1=(W+hw)/2+G;
-  let pool=[];
-  const seg=(l,r,y)=>{const w=r-l;if(w<h*.6)return;const acc=[];let sum=0;
-    for(let g=0;g<300;g++){if(!pool.length)pool=hmShuf(VB);let bi=0,bc=1e9;
-      for(let k=0;k<Math.min(8,pool.length);k++){const c=Math.abs((sum+hmA(pool[k]))*h-w);if(c<bc){bc=c;bi=k}}
-      if(acc.length&&bc>=Math.abs(sum*h-w))break;
-      sum+=hmA(pool[bi]);acc.push(pool.splice(bi,1)[0])}
-    const k=w/(sum*h);let x=l;
-    acc.forEach(v=>{const wd=hmA(v)*h*k,d=document.createElement('div');d.className='hmt';d._v=v;d._a=wd/h;
+  const hw=he.offsetWidth,hh=he.offsetHeight,G=3;
+  const avA=VB.reduce((s,v)=>s+hmA(v),0)/VB.length;
+  let t=Math.max(50,Math.min(hmSz(),W/2));
+  t=Math.min(Math.max(t,Math.sqrt(Math.max(0,W*H-hw*hh)/(VB.length*avA))*1.05),H/2);
+  // chiều cao hàng ngẫu nhiên 0.7t–1.4t, co giãn cho vừa khít H
+  let hs=[],sum=0;while(sum<H-t*.5){const v=t*(.7+Math.random()*.7);hs.push(v);sum+=v}
+  if(hs.length>1&&H-sum+hs[hs.length-1]<t*.5){sum-=hs.pop()}
+  const f=H/hs.reduce((p,q)=>p+q,0);hs=hs.map(v=>v*f);
+  const ys=[];let yy=0;hs.forEach(v=>{ys.push(yy);yy+=v});
+  // các hàng chứa hero (gần giữa nhất, phủ đủ chiều cao)
+  let ba=0,bm=hs.length,bs=1e9;
+  for(let i=0;i<hs.length;i++){let e=i,tot=0;while(e<hs.length&&tot<hh+2*G){tot+=hs[e];e++}
+    if(tot<hh+2*G)break;const c=ys[i]+tot/2,d=Math.abs(c-H/2);if(d<bs){bs=d;ba=i;bm=e-i}}
+  const x0=(W-hw)/2-G,x1=(W+hw)/2+G;
+  let pool=[];const next=()=>{if(!pool.length)pool=hmShuf(VB);return pool.shift()};
+  const seg=(l,r,y,h)=>{const w=r-l;if(w<h*.5)return;
+    let k=Math.max(1,Math.round(w/(h*avA*(.85+Math.random()*.4))));
+    const vs=[],wt=[];for(let i=0;i<k;i++){const v=next();vs.push(v);wt.push(Math.max(.55,Math.min(2.4,hmA(v)))*(.8+Math.random()*.5))}
+    const tot=wt.reduce((p,q)=>p+q,0);let x=l;
+    vs.forEach((v,i)=>{const wd=w*wt[i]/tot,d=document.createElement('div');d.className='hmt';d._v=v;d._a=wd/h;
       d.style.cssText=`left:${x+1.5}px;top:${y+1.5}px;width:${wd-3}px;height:${h-3}px`;T.appendChild(d);hmFill(d,v);hmSlots.push(d);x+=wd})};
-  for(let i=0;i<n;i++){const y=i*h;if(i>=a&&i<a+m){seg(0,x0,y);seg(x1,W,y)}else seg(0,W,y)}
-  he.style.top=(a*h+G)+'px';he.style.height=(m*h-2*G)+'px';he.style.transform='translateX(-50%)'}
+  hs.forEach((h,i)=>{const y=ys[i];if(i>=ba&&i<ba+bm){seg(0,x0,y,h);seg(x1,W,y,h)}else seg(0,W,y,h)});
+  let hy=ys[ba],hb=ys[ba+bm-1]+hs[ba+bm-1];
+  he.style.top=(hy+G)+'px';he.style.height=(hb-hy-2*G)+'px';he.style.transform='translateX(-50%)'}
 function hmSwap(){if(document.body.dataset.view!=='home'||!hmSlots.length)return;
   const pool=VB.filter(v=>!hmSlots.some(d=>d._v===v)),n=Math.max(1,Math.round(hmSlots.length/10)),
-    ch=(d,v)=>{d._v=v;d.style.opacity=0;setTimeout(()=>{hmFill(d,v);d.style.opacity=1},450)},ok=(a,b)=>Math.abs(a-b)<=.12*b;
+    ch=(d,v)=>{d._v=v;d.style.opacity=0;setTimeout(()=>{hmFill(d,v);d.style.opacity=1},450)},ok=(a,b)=>Math.abs(a-b)<=.45*b;
   for(let k=0;k<n;k++){const d=hmSlots[Math.random()*hmSlots.length|0],c=pool.filter(x=>ok(hmA(x),d._a));
     if(c.length){const v=c[Math.random()*c.length|0];pool.splice(pool.indexOf(v),1);pool.push(d._v);ch(d,v)}
     else if(hmSlots.length>1){const c2=hmSlots.filter(e=>e!==d&&ok(hmA(e._v),d._a)&&ok(hmA(d._v),e._a));if(!c2.length)continue;
