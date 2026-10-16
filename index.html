@@ -627,7 +627,7 @@ textarea.tx{resize:none;overflow:hidden;display:block;width:auto;font-size:14px;
   </div>
 </div></main>
 <main id="tkb" hidden><div class="card">
-  <div class="tt-bar"><h2 style="margin:0" class="grow">🗓 Thời khóa biểu</h2><button class="btn ghost" id="ttPrev">‹</button><b id="ttLbl" style="min-width:110px;text-align:center"></b><button class="btn ghost" id="ttNext">›</button><button class="btn ghost" id="ttNow">Tuần này</button><button class="btn" id="ttAdd">+ Thêm lịch học</button><button class="btn ghost" id="ttAddE">+ Thêm sự kiện</button><button class="btn ghost" id="ttAddA">+ Sự kiện cả ngày</button></div>
+  <div class="tt-bar"><h2 style="margin:0" class="grow">🗓 Thời khóa biểu</h2><button class="btn ghost" id="ttPrev">‹</button><b id="ttLbl" style="min-width:110px;text-align:center"></b><button class="btn ghost" id="ttNext">›</button><button class="btn ghost" id="ttNow">Tuần này</button><button class="btn" id="ttAdd">+ Thêm lịch học</button><button class="btn ghost" id="ttAddE">+ Thêm sự kiện</button></div>
   <div class="mute" style="margin-bottom:8px">Thêm lịch học (nền đặc) và sự kiện (viền nét đứt) tại đây. Cả hai vẫn hiện trong Việc &amp; kế hoạch và lịch ở trang chủ.</div>
   <div class="tt-wrap"><div class="tt-g" id="ttG"></div></div>
 </div></main>
@@ -1177,7 +1177,8 @@ function openEv(id,date,cls,allDay){evId=id;const x=id?evBy(id):{t:'',d:date||tD
   $('#evT').value=x.t;$('#evD').value=x.d;$('#evD2').value=x.d2||'';$('#evS').value=x.s||'';$('#evE').value=x.e||'';$('#evC').value=x.c||'#3b6ea5';$('#evR').value=x.r||'none';$('#evU').value=x.u||'';$('#evN').value=x.n||'';evIsL=!!x.l;$('#pcBox').hidden=!evIsL;
   $('#evDel').style.display=id?'':'none';$('#evH').textContent=id?(evIsL?'Sửa lịch học':'Sửa lịch trình'):(evIsL?'Thêm lịch học':'Thêm lịch trình');
   $('#evAD').checked=id?!x.s:!!allDay;adSync();pcAuto();if(!$('#evdlg').open)$('#evdlg').showModal();if(!id)$('#evT').focus()}
-function adSync(){const a=$('#evAD').checked;$('#evS').disabled=$('#evE').disabled=a;if(a){$('#evS').value='';$('#evE').value=''}syncPc()}
+function adSync(){const a=$('#evAD').checked,r=$('#evS').closest('.row');$('#evS').disabled=$('#evE').disabled=a;if(a){$('#evS').value='';$('#evE').value=''}
+  r.hidden=a;r.nextElementSibling.hidden=a;$('#pcBox').hidden=a||!evIsL;syncPc()}
 $('#evAD').onchange=adSync;
 $('#evD2').oninput=e=>{if(e.target.value){$('#evAD').checked=true;adSync();$('#evR').value='none'}};
 function evRefresh(){rPlan();rHev();if(!$('#calPop').hidden)rCal();window.rTT&&rTT()}
@@ -2043,7 +2044,6 @@ window.rTT=()=>{const root=$('#tkb');if(!root||root.hidden)return;
 $('#ttG').onclick=e=>{const v=e.target.closest('[data-ev]');if(v)openEv(v.dataset.ev)};
 $('#ttPrev').onclick=()=>{off--;rTT()};$('#ttNext').onclick=()=>{off++;rTT()};$('#ttNow').onclick=()=>{off=0;rTT()};
 $('#ttAdd').onclick=()=>{const d=new Date(monday(off));const t=iso(new Date());const k=off===0?t:iso(d);openEv(null,k,true)};
-$('#ttAddA').onclick=()=>{const d=new Date(monday(off));const t=iso(new Date());const k=off===0?t:iso(d);openEv(null,k,false,true)};
 $('#ttAddE').onclick=()=>{const d=new Date(monday(off));const t=iso(new Date());const k=off===0?t:iso(d);openEv(null,k,false)};
 setInterval(()=>rTT(),60000);
 try{[['Thời khóa biểu','Timetable'],['Tài khoản & ngôn ngữ','Account & language'],['+ Thêm lịch học','+ Add class'],['Lịch học thêm tại đây (nền đặc). Sự kiện thêm ở Việc & kế hoạch cũng hiện ở đây (viền nét đứt).','Classes are added here (solid). Events added in Tasks & plan also show here (dashed outline).'],['Ca học (bấm 1 ca = cả 2 phiên)','Slot (tap one = both sessions)'],['Phiên (bấm 1 phiên, hoặc phiên đầu rồi phiên cuối)','Session (tap one, or first then last)'],['Thêm lịch học','Add class'],['Sửa lịch học','Edit class'],['🗓 Thời khóa biểu','🗓 Timetable'],['TKB','Timetable']].forEach(([a,b])=>LD.set(a,b))}catch(e){}
