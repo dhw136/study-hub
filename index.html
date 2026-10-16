@@ -176,7 +176,9 @@ body{background-image:radial-gradient(color-mix(in srgb,var(--ink) 9%,transparen
 .vbt{padding:22px 16px;min-height:110px;color:#fff;font-weight:600;line-height:1.3;display:flex;align-items:center;word-break:break-word}
 .vbc{position:relative;overflow:hidden}
 .vbcut{right:auto!important;left:6px;font-size:13px;line-height:1;padding:0}
-.vbi.ce{outline:2px solid var(--acc);outline-offset:-2px;cursor:move;z-index:40}.vbi.ce .vbx{opacity:1}.vbi.ce .vbr{display:none}
+.vbi.ce{outline:2px solid var(--acc);outline-offset:-2px;z-index:40;overflow:visible}.vbi.ce .vbc{border-radius:inherit;overflow:hidden}.vbi.ce .vbx{opacity:1}.vbi.ce .vbr{display:none}
+.vch{position:absolute;width:16px;height:16px;background:#fff;border:2px solid var(--acc);border-radius:4px;z-index:5;touch-action:none;box-sizing:border-box}
+.vch[data-h=nw]{left:-8px;top:-8px;cursor:nwse-resize}.vch[data-h=n]{left:calc(50% - 8px);top:-8px;cursor:ns-resize}.vch[data-h=ne]{right:-8px;top:-8px;cursor:nesw-resize}.vch[data-h=e]{right:-8px;top:calc(50% - 8px);cursor:ew-resize}.vch[data-h=se]{right:-8px;bottom:-8px;cursor:nwse-resize}.vch[data-h=s]{left:calc(50% - 8px);bottom:-8px;cursor:ns-resize}.vch[data-h=sw]{left:-8px;bottom:-8px;cursor:nesw-resize}.vch[data-h=w]{left:-8px;top:calc(50% - 8px);cursor:ew-resize}
 #vbCrop{width:min(760px,96vw)}
 #vcStage{position:relative;display:block;margin:10px auto;width:fit-content;max-width:100%;line-height:0;user-select:none;touch-action:none;overflow:hidden;border-radius:8px}
 #vcImg{max-width:100%;max-height:60vh;display:block;pointer-events:none;-webkit-user-drag:none}
@@ -998,7 +1000,7 @@ const tfs=(v,w)=>Math.round((v.t.length>60?15:v.t.length>25?19:25)*Math.min(2.2,
 const vbRes='<i class="vbr" data-vr="1" title="Kéo để đổi cỡ · bấm đúp để về mặc định">◢</i>';
 function rVB(){const g=$('#vbGrid');g.style.setProperty('--vbw',vbBase()+'px');g.classList.add('pend');
   g.innerHTML=VB.map(v=>{const pos=v.x!=null?`left:${v.x}px;top:${v.y}px;`:'';
-    return v.k==='img'?`<div class="vbi" data-id="${v.id}" style="${pos}--s:${v.s||1}"><div class="vbc"><img src="${v.src}" alt="" draggable="false"></div><button class="vbx vbcut" data-vc="${v.id}" title="Cắt ảnh">✂</button><button class="vbx" data-vd="${v.id}">✕</button>${vbRes}</div>`:`<div class="vbi vbt" data-id="${v.id}" style="${pos}--s:${v.s||1};background:linear-gradient(135deg,${v.c[0]},${v.c[1]});font-size:${tfs(v,vbBase()*(v.s||1))}px">${esc(v.t)}<button class="vbx" data-vd="${v.id}">✕</button>${vbRes}</div>`}).join('')||'<p class="mute" style="padding:12px">Chưa có gì. Thêm ảnh về ước mơ, nơi bạn muốn đến, điểm số muốn đạt…</p>';
+    return v.k==='img'?`<div class="vbi" data-id="${v.id}" style="${pos}--s:${v.s||1}"><div class="vbc"><img src="${v.src}" alt="" draggable="false"></div><button class="vbx vbcut" data-vc="${v.id}" title="Xén ảnh">✂</button><button class="vbx" data-vd="${v.id}">✕</button>${vbRes}</div>`:`<div class="vbi vbt" data-id="${v.id}" style="${pos}--s:${v.s||1};background:linear-gradient(135deg,${v.c[0]},${v.c[1]});font-size:${tfs(v,vbBase()*(v.s||1))}px">${esc(v.t)}<button class="vbx" data-vd="${v.id}">✕</button>${vbRes}</div>`}).join('')||'<p class="mute" style="padding:12px">Chưa có gì. Thêm ảnh về ước mơ, nơi bạn muốn đến, điểm số muốn đạt…</p>';
   Promise.all([...g.querySelectorAll('img')].map(i=>i.decode?i.decode().catch(()=>{}):0)).then(()=>{g.querySelectorAll('.vbi').forEach(el=>{const v=VB.find(x=>x.id===el.dataset.id);if(v&&v.k==='img')vbApplyCrop(el,v)});vbNorm(true);g.classList.remove('pend')})}
 function vbApplyCrop(el,v){const im=el.querySelector('img'),c=el.querySelector('.vbc');if(!im||!c)return;
   if(!v.cr||!im.naturalWidth){c.style.aspectRatio='';im.style.cssText='';return}
@@ -1014,7 +1016,7 @@ $('#vbText2').onclick=()=>{$('#vbMake').style.display='flex';$('#vbT').focus()};
 document.addEventListener('paste',e=>{const f=[...(e.clipboardData?e.clipboardData.items:[])].filter(i=>i.type.startsWith('image/')).map(i=>i.getAsFile()).filter(Boolean);if(f.length)addFiles(f)});
 $('#vb').ondragover=e=>e.preventDefault();
 $('#vb').ondrop=e=>{e.preventDefault();if(e.dataTransfer.files.length)addFiles(e.dataTransfer.files)};
-$('#vbGrid').onclick=e=>{const d=e.target.dataset.vd,c=e.target.dataset.vc;if(d){VB=VB.filter(v=>v.id!==d);saveVB();rVB()}else if(c){const it=e.target.closest('.vbi');if(it)vbCE(it)}else if(e.target.dataset.vz){const it=e.target.closest('.vbi');if(it)vbZoom(it,+e.target.dataset.vz,.5,.5)}};
+$('#vbGrid').onclick=e=>{const d=e.target.dataset.vd,c=e.target.dataset.vc;if(d){VB=VB.filter(v=>v.id!==d);saveVB();rVB()}else if(c){const it=e.target.closest('.vbi');if(it)vbCE(it)}};
 $('#vbC').innerHTML=Object.keys(VG).map(k=>`<option>${k}</option>`).join('');
 $('#vbText').onclick=()=>{$('#set').close();showView('vision');$('#vbMake').style.display='flex';$('#vbT').focus()};
 $('#vbCancel').onclick=()=>{$('#vbMake').style.display='none'};
@@ -1336,34 +1338,35 @@ function vbNorm(save){const gw=vbGrid.clientWidth;if(!gw)return;vbHero();let ch=
   vbH();if(ch&&save!==false)saveVB()}
 function vbFonts(){$$('#vbGrid .vbt').forEach(el=>{const v=VB.find(x=>x.id===el.dataset.id);if(v)el.style.fontSize=tfs(v,el.offsetWidth)+'px'})}
 
-// ===== Chỉnh cắt ảnh trực tiếp trên ô: kéo để dịch, lăn chuột / nút +− để phóng =====
+// ===== Xén ảnh trực tiếp trên ô: kéo cạnh / góc để bỏ bớt phần ảnh (kéo ra lại để lấy lại) =====
 function vbCEstate(it){const v=VB.find(x=>x.id===it.dataset.id),im=it.querySelector('img'),c=it.querySelector('.vbc');
   if(!v||!im||!c||!im.naturalWidth)return null;return {v,im,c,ia:im.naturalWidth/im.naturalHeight}}
 function vbCE(it){
-  if(it.classList.contains('ce')){it.classList.remove('ce');it.querySelectorAll('.vbz').forEach(b=>b.remove());
-    const b=it.querySelector('.vbcut');b.textContent='✂';b.title='Cắt ảnh';
+  if(it.classList.contains('ce')){it.classList.remove('ce');it.querySelectorAll('.vch').forEach(b=>b.remove());
+    const b=it.querySelector('.vbcut');b.textContent='✂';b.title='Xén ảnh';
     const v=VB.find(x=>x.id===it.dataset.id);if(v&&v.cr&&v.cr.w>.999&&v.cr.h>.999){delete v.cr;vbApplyCrop(it,v)}
     saveVB();vbNorm(true);return}
   const st=vbCEstate(it);if(!st)return;
   $$('#vbGrid .vbi.ce').forEach(o=>{if(o!==it)vbCE(o)});
   if(!st.v.cr)st.v.cr={x:0,y:0,w:1,h:1};
   it.classList.add('ce');const b=it.querySelector('.vbcut');b.textContent='✓';b.title='Xong';
-  [['−',.85],['+',1.18]].forEach(([t,k],i)=>{const z=document.createElement('button');z.className='vbx vbz';z.textContent=t;z.dataset.vz=k;z.style.cssText=`top:auto;bottom:6px;right:${i?6:36}px`;it.appendChild(z)})}
-function vbCrop(it,fn){const st=vbCEstate(it);if(!st)return;const {v,ia,c}=st,A=c.offsetWidth/c.offsetHeight,r=Object.assign({},v.cr);
-  fn(r,A,ia);r.h=r.w*ia/A;
-  r.x=Math.min(Math.max(0,r.x),1-r.w);r.y=Math.min(Math.max(0,r.y),1-r.h);
-  v.cr=r;vbApplyCrop(it,v)}
-function vbZoom(it,k,fx,fy){vbCrop(it,(r,A,ia)=>{const hh=r.w*ia/A,px=r.x+fx*r.w,py=r.y+fy*hh;
-  r.w=Math.min(Math.max(.06,r.w/k),Math.min(1,A/ia));const nh=r.w*ia/A;r.x=px-fx*r.w;r.y=py-fy*nh})}
-vbGrid.addEventListener('pointerdown',e=>{const it=e.target.closest('.vbi.ce');if(!it||e.button>0||e.target.closest('.vbx'))return;
-  const c=it.querySelector('.vbc');let px=e.clientX,py=e.clientY;it.setPointerCapture(e.pointerId);e.preventDefault();
-  const mv=ev=>{const dx=ev.clientX-px,dy=ev.clientY-py;px=ev.clientX;py=ev.clientY;
-    vbCrop(it,(r,A,ia)=>{r.x-=dx/c.offsetWidth*r.w;r.y-=dy/c.offsetHeight*(r.w*ia/A)})};
-  const up=()=>{it.removeEventListener('pointermove',mv);it.removeEventListener('pointerup',up);it.removeEventListener('pointercancel',up);saveVB()};
-  it.addEventListener('pointermove',mv);it.addEventListener('pointerup',up);it.addEventListener('pointercancel',up)});
-vbGrid.addEventListener('wheel',e=>{const it=e.target.closest('.vbi.ce');if(!it)return;e.preventDefault();
-  const b=it.querySelector('.vbc').getBoundingClientRect();vbZoom(it,e.deltaY<0?1.12:1/1.12,(e.clientX-b.left)/b.width,(e.clientY-b.top)/b.height);
-  clearTimeout(window._vz);window._vz=setTimeout(saveVB,300)},{passive:false});
+  ['nw','n','ne','e','se','s','sw','w'].forEach(h=>{const i=document.createElement('i');i.className='vch';i.dataset.h=h;it.appendChild(i)})}
+vbGrid.addEventListener('pointerdown',e=>{const hd=e.target.closest('.vch');if(!hd||e.button>0)return;
+  const it=hd.closest('.vbi'),st=vbCEstate(it);if(!st)return;e.preventDefault();e.stopPropagation();
+  const {v,ia,c}=st,h=hd.dataset.h,r0=Object.assign({},v.cr),s0=v.s||1,W0=it.offsetWidth,H0=it.offsetHeight,
+    L0=it.offsetLeft,T0=it.offsetTop,cw=c.offsetWidth,ch=c.offsetHeight,sx=e.clientX,sy=e.clientY,MIN=36;
+  hd.setPointerCapture(e.pointerId);
+  const mv=ev=>{const dx=(ev.clientX-sx)/cw*r0.w,dy=(ev.clientY-sy)/ch*r0.h,r=Object.assign({},r0),mw=r0.w*MIN/cw,mh=r0.h*MIN/ch;
+    if(h.includes('w')){const nx=Math.min(Math.max(0,r0.x+dx),r0.x+r0.w-mw);r.x=nx;r.w=r0.x+r0.w-nx}
+    if(h.includes('e')){r.w=Math.min(Math.max(mw,r0.w+dx),1-r0.x)}
+    if(h.includes('n')){const ny=Math.min(Math.max(0,r0.y+dy),r0.y+r0.h-mh);r.y=ny;r.h=r0.y+r0.h-ny}
+    if(h.includes('s')){r.h=Math.min(Math.max(mh,r0.h+dy),1-r0.y)}
+    v.cr=r;v.s=s0*r.w/r0.w;it.style.setProperty('--s',v.s);vbApplyCrop(it,v);
+    const nW=it.offsetWidth,nH=it.offsetHeight;
+    it.style.left=(h.includes('w')?L0+W0-nW:L0)+'px';it.style.top=(h.includes('n')?T0+H0-nH:T0)+'px'};
+  const up=()=>{hd.removeEventListener('pointermove',mv);hd.removeEventListener('pointerup',up);hd.removeEventListener('pointercancel',up);
+    v.x=it.offsetLeft;v.y=it.offsetTop;hmAM.delete(v.id);saveVB();vbNorm(true)};
+  hd.addEventListener('pointermove',mv);hd.addEventListener('pointerup',up);hd.addEventListener('pointercancel',up)});
 $('#vbSz').value=vbBase();$('#vbSzV').textContent=vbBase();
 $('#vbSz').oninput=e=>{S.vbSize=+e.target.value;$('#vbSzV').textContent=S.vbSize;vbGrid.style.setProperty('--vbw',S.vbSize+'px');vbFonts()};
 $('#vbSz').onchange=()=>{save();vbNorm(true)};
@@ -1380,7 +1383,7 @@ let vbArm=false;
 vbGrid.addEventListener('touchmove',ev=>{if(vbArm&&ev.cancelable)ev.preventDefault()},{passive:false});
 if(matchMedia('(pointer:coarse)').matches)vbGrid.addEventListener('contextmenu',e=>{if(e.target.closest('.vbi'))e.preventDefault()});
 vbGrid.addEventListener('pointerdown',e=>{
-  if(e.button>0||e.target.closest('.vbr,.vbx,.vbz,.vbi.ce'))return;
+  if(e.button>0||e.target.closest('.vbr,.vbx,.vch'))return;
   const it=e.target.closest('.vbi');if(!it)return;const v=VB.find(x=>x.id===it.dataset.id);if(!v)return;
   const sx=e.clientX,sy=e.clientY,x0=it.offsetLeft,y0=it.offsetTop,w=it.offsetWidth,h=it.offsetHeight,id=v.id;
   const els={},orig=vbEls(id).map(el=>{els[el.dataset.id]=el;return Object.assign({id:el.dataset.id},vbRect(el))});
@@ -1634,7 +1637,7 @@ RX.push(
  [/(\d+) mìn/g,'$1 mines'],[/^Dễ ·/,'Easy ·'],[/^Vừa ·/,'Medium ·'],[/^Khó \(Expert\)/,'Hard (Expert)'],[/^Siêu khó ·/,'Insane ·'],
  [/rất khó/g,'very hard'],[/chuẩn/g,'standard'],[/rất dễ/g,'very easy'],[/· dễ$/,'· easy']);
 try{[["Mũ chóp", "Top hat"], ["Vương miện", "Crown"], ["Mũ tốt nghiệp", "Graduation cap"], ["Mũ lưỡi trai", "Cap"], ["Mũ rộng vành", "Wide-brim hat"], ["Mũ cứu hộ", "Hard hat"], ["Mũ lính", "Soldier helmet"], ["Nơ", "Bow"], ["Hoa anh đào", "Cherry blossom"], ["Hoa hướng dương", "Sunflower"], ["Mũ Noel", "Santa hat"], ["Mũ nấm", "Mushroom hat"], ["Bóng bay", "Balloon"], ["Gà con", "Chick"], ["Cầu vồng", "Rainbow"], ["Ngôi sao", "Star"], ["Kính râm", "Sunglasses"], ["Kính cận", "Glasses"], ["Kính bơi", "Goggles"], ["Kính mũi râu", "Disguise glasses"], ["Kính lúp", "Magnifier"], ["Khăn len", "Scarf"], ["Huy chương", "Medal"], ["Chuỗi hạt", "Beads"], ["Chuông nhỏ", "Little bell"], ["Ruy-băng", "Ribbon"], ["Huy chương vàng", "Gold medal"], ["Kim cương", "Diamond"], ["Nơ bướm", "Bow tie"], ["Bùa may mắn", "Lucky charm"], ["Cỏ bốn lá", "Four-leaf clover"], ["Áo thun", "T-shirt"], ["Sơ mi", "Shirt"], ["Áo khoác", "Jacket"], ["Áo blouse", "Lab coat"], ["Áo phản quang", "Hi-vis vest"], ["Váy", "Dress"], ["Võ phục", "Martial arts gi"], ["Áo thể thao", "Sports jersey"], ["Đồ bơi", "Swimsuit"], ["Ba lô", "Backpack"], ["Bóng đá", "Football"], ["Bóng rổ", "Basketball"], ["Gấu bông", "Teddy bear"], ["Sách", "Books"], ["Chậu cây", "Potted plant"], ["Cà phê", "Coffee"], ["Trà xanh", "Green tea"], ["Diều", "Kite"], ["Bảng màu", "Palette"], ["Tai nghe", "Headphones"], ["Đũa phép", "Magic wand"], ["Máy chơi game", "Game console"], ["Kèn", "Trumpet"], ["Ván trượt", "Skateboard"], ["Vĩ cầm", "Violin"], ["Kính thiên văn", "Telescope"], ["Cúp", "Trophy"], ["Mèo", "Cat"], ["Cún", "Dog"], ["Thỏ", "Rabbit"], ["Ếch", "Frog"], ["Cáo", "Fox"], ["Gấu nâu", "Brown bear"], ["Gấu trúc", "Panda"], ["Cánh cụt", "Penguin"], ["Sư tử", "Lion"], ["Hổ", "Tiger"], ["Kỳ lân", "Unicorn"], ["Rồng", "Dragon"], ["Cam", "Orange"], ["Nho", "Grapes"], ["Đã sở hữu", "Owned"], ["Đang chọn ✓", "Selected ✓"], ["Chọn", "Select"], ["Cởi ra", "Take off"], ["Mặc", "Wear"], ["Chưa đủ xu — học thêm một chút nhé 📚", "Not enough coins — study a bit more 📚"], ["Đói quá rồi, cho ăn đi bạn ơi! 🥺", "I'm so hungry, please feed me! 🥺"], ["Hơi đói bụng… 🍽️", "A bit hungry… 🍽️"], ["Buồn buồn, học bài để vui lên nhé 📚", "Feeling a bit sad, study to cheer me up 📚"], ["💥 Nổ mìn rồi! Thử lại nhé", "💥 Boom! Try again"], ["😵 Hết nước đi!", "😵 No moves left!"], ["🎉 Đã đạt 2048! Chơi tiếp được nhé", "🎉 You reached 2048! You can keep playing"], ["Tết Dương lịch", "New Year's Day"], ["Quốc tế Phụ nữ", "International Women's Day"], ["Giải phóng miền Nam", "Reunification Day"], ["Quốc tế Lao động", "International Labour Day"], ["Quốc tế Thiếu nhi", "Children's Day"], ["Quốc khánh", "National Day"], ["Ngày Phụ nữ Việt Nam", "Vietnamese Women's Day"], ["Ngày Nhà giáo Việt Nam", "Vietnamese Teachers' Day"], ["Giáng sinh", "Christmas"], ["Rằm tháng Giêng", "Lantern Festival"], ["Giỗ Tổ Hùng Vương", "Hung Kings' Festival"], ["Lễ Phật Đản", "Vesak"], ["Tết Đoan Ngọ", "Double Fifth Festival"], ["Lễ Vu Lan", "Vu Lan Festival"], ["Tết Trung Thu", "Mid-Autumn Festival"], ["Ông Táo chầu trời", "Kitchen Gods' Day"], ["Cắt ảnh", "Crop image"], ["Tự do", "Free"], ["Gốc", "Original"], ["Task nhỏ đã xong", "Subtask done"], ["Task nhỏ hơn đã xong", "Sub-subtask done"], ["Thêm task nhỏ hơn", "Add sub-subtask"], ["Document PiP lỗi, dùng video PiP", "Document PiP failed, using video PiP"], ["File không phải bản sao lưu của Study Hub.", "This file is not a Study Hub backup."], ["Không khôi phục được (bộ nhớ trình duyệt đầy).", "Couldn't restore (browser storage is full)."], ["Không lưu được ảnh (bộ nhớ trình duyệt/ổ đĩa đầy hoặc bị chặn). Hãy xoá bớt ảnh hoặc giải phóng dung lượng.", "Couldn't save the images (browser storage/disk is full or blocked). Delete some images or free up space."], ["Đã thêm ✓", "Added ✓"], ["Sai email hoặc mật khẩu.", "Wrong email or password."], ["Sai mật khẩu.", "Wrong password."], ["Email chưa có tài khoản.", "No account with this email."], ["Email này đã có tài khoản, hãy bấm Đăng nhập.", "This email already has an account, click Sign in."], ["Mật khẩu cần ít nhất 6 ký tự.", "Password needs at least 6 characters."], ["Email không hợp lệ.", "Invalid email."], ["Bạn đã đóng cửa sổ đăng nhập.", "You closed the sign-in window."], ["Tên miền này chưa được thêm vào Authorized domains trong Firebase.", "This domain hasn't been added to Authorized domains in Firebase."], ["Không có mạng.", "No network."], ["Thử quá nhiều lần, hãy đợi một lúc.", "Too many attempts, please wait a moment."], ["mới sửa", "edited"], ["Đang kiểm tra dữ liệu…", "Checking data…"], ["Không tải được thư viện Firebase. Hãy kiểm tra mạng và mở app qua https.", "Couldn't load the Firebase library. Check your network and open the app over https."], ["Nhập email trước rồi bấm lại.", "Enter your email first, then click again."], ["Đã gửi email đặt lại mật khẩu.", "Password reset email sent."], ["Ngoại tuyến — sẽ đồng bộ khi có mạng", "Offline — will sync when back online"], ["Đã có mạng, đang đồng bộ…", "Back online, syncing…"], ["Xoá trang này?", "Delete this page?"], ["Tài khoản này đã có dữ liệu trên đám mây.\n\nOK = dùng dữ liệu trên đám mây (dữ liệu trên máy này được lưu một bản sao lưu).\nHuỷ = giữ dữ liệu trên máy này và ghi đè lên đám mây.", "This account already has data in the cloud.\n\nOK = use the cloud data (the data on this device is saved as a backup).\nCancel = keep this device's data and overwrite the cloud."]].forEach(([a,b])=>LD.set(a,b))}catch(e){}
-LD.set('Lịch học','Class');LD.set('Cổ','Neck');
+LD.set('Lịch học','Class');LD.set('Xén ảnh','Crop image');LD.set('Cổ','Neck');
 RX.push([/Tết Nguyên Đán \(mùng (\d)\)/g,'Lunar New Year (day $1)'],[/^Đã mua /,'Bought '],[/^Chào /,'Hi '],[/Hoàn thành/g,'Done'],[/Thắng /g,'Won '],[/kỷ lục mới/g,'new record'],[/^(Lỗi đồng bộ|Lỗi): /,'Error: '],[/^Phiên (\d)/,'Session $1'],[/Lỗi: /g,'Error: ']);
 if(S.lang==='en'){unTree(document.body);trTree(document.body)}
 
