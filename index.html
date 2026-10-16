@@ -321,7 +321,12 @@ body{overscroll-behavior-y:contain}
 @media(max-width:700px){
   main{padding:10px 10px calc(84px + env(safe-area-inset-bottom,0px))}
   #home{padding:0}
-  nav#nav,#calBtn,#theme,#pipH,#pipBtn,#layBtn,#layReset{display:none!important}
+  nav#nav,#pipH,#pipBtn,#layBtn,#layReset{display:none!important}
+  header .btn{padding:0 10px;min-height:36px}
+  header h1{font-size:15px;white-space:nowrap}
+  #bnav{gap:0;padding-left:2px;padding-right:2px}
+  #bnav button{flex:1 1 0;padding:5px 0;font-size:10.5px;letter-spacing:-.2px}
+  #bnav button b{font-size:19px}
   header{padding:8px 12px;gap:6px 10px}
   .hbar{justify-content:flex-end}
   #bnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:2500;background:var(--card);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));gap:4px;box-shadow:0 -2px 12px #0000001a}
@@ -341,6 +346,7 @@ body{overscroll-behavior-y:contain}
   .card{padding:14px;border-radius:12px}
   .board{display:flex!important;flex-direction:column;align-items:stretch}
   .board>.card{min-width:0;width:100%;margin-bottom:12px}
+  .board[hidden]{display:none!important}
   .board>#todo{order:1}.board>#timer{order:2}.board>#plan{order:3}.board>#goalCard{order:4}
   .pdays{grid-template-columns:repeat(2,minmax(0,1fr))}
   .phead h2{font-size:28px}
@@ -472,7 +478,7 @@ textarea.tx{resize:none;overflow:hidden;display:block;width:auto;font-size:14px;
 #vbGrid .vbg{position:absolute;left:6px;bottom:6px;max-width:calc(100% - 44px);border:0;border-radius:99px;color:#fff;padding:2px 8px;font-size:11px;line-height:1.4;opacity:.9;cursor:pointer;-webkit-appearance:none;appearance:none;z-index:3;text-overflow:ellipsis}
 #vbGrid .vbg option{color:var(--ink);background:var(--card)}
 /* ===== điện thoại: chia trang ===== */
-#wkTabs,#fcTabs,#moreSheet{display:none}
+#wkTabs,#fcTabs{display:none}
 @media(max-width:700px){
   #wkTabs,#fcTabs{display:flex;gap:6px;margin:0 0 12px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 50px);z-index:30;background:var(--bg);padding:6px 0}
   #wkTabs button,#fcTabs button{flex:1;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:8px 4px;font-weight:600;font-size:14px;color:var(--mute);cursor:pointer}
@@ -480,11 +486,6 @@ textarea.tx{resize:none;overflow:hidden;display:block;width:auto;font-size:14px;
   .board>.card{display:none}
   body[data-wk=todo] .board>#todo:not(.hid),body[data-wk=plan] .board>#plan:not(.hid),body[data-wk=goalCard] .board>#goalCard:not(.hid){display:block}
   body[data-fc=pet] #fcL,body[data-fc=timer] #fcR{display:none}
-  #moreSheet:not([hidden]){display:block;position:fixed;inset:0;z-index:2600;background:#0006}
-  #moreSheet .in{position:absolute;left:0;right:0;bottom:0;background:var(--card);border-radius:18px 18px 0 0;padding:16px 12px calc(86px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:repeat(3,1fr);gap:10px;box-shadow:0 -6px 24px #0004}
-  #moreSheet button{display:flex;flex-direction:column;align-items:center;gap:4px;min-height:76px;justify-content:center;border:1px solid var(--line);background:var(--bg);border-radius:14px;color:var(--ink);font-size:13px;cursor:pointer}
-  #moreSheet button b{font-size:26px;font-weight:400;line-height:1.1}
-  #moreSheet button.on{border-color:var(--acc);background:var(--acc2);color:var(--acc);font-weight:600}
   #bnav button{flex:1 1 0}
 }
 /* ===== thanh trên cùng: 1 hàng, mọi mục cùng cỡ (desktop) ===== */
@@ -527,8 +528,7 @@ textarea.tx{resize:none;overflow:hidden;display:block;width:auto;font-size:14px;
   <div class="calpop" id="calPop" hidden></div>
   <span class="row"><button class="btn ghost" id="layReset" style="display:none">Đặt lại bố cục</button><button class="btn ghost" id="layBtn">✥ Bố cục</button><button class="btn ghost" id="theme" title="Cài đặt">⚙</button></span>
 </header>
-<nav id="bnav"><button data-v="home" class="on"><b>🏠</b><span>Trang chủ</span></button><button data-v="work"><b>📋</b><span>Kế hoạch</span></button><button data-v="tkb"><b>🗓</b><span>TKB</span></button><button data-v="focus"><b>🐾</b><span>Học</span></button><button data-bn="more"><b>☰</b><span>Khác</span></button></nav>
-<div id="moreSheet" hidden><div class="in"><button data-v="vision"><b>🖼</b><span>Vision board</span></button><button data-v="notes"><b>✏️</b><span>Sổ tay</span></button><button data-v="fun"><b>🎮</b><span>Giải trí</span></button><button data-bn="cal"><b>📅</b><span>Lịch</span></button><button data-bn="set"><b>⚙</b><span>Cài đặt</span></button></div></div>
+<nav id="bnav"><button data-v="home" class="on"><b>🏠</b><span>Chủ</span></button><button data-v="vision"><b>🖼</b><span>Vision</span></button><button data-v="work"><b>📋</b><span>Kế hoạch</span></button><button data-v="notes"><b>✏️</b><span>Sổ tay</span></button><button data-v="focus"><b>🐾</b><span>Học</span></button><button data-v="fun"><b>🎮</b><span>Giải trí</span></button><button data-v="tkb"><b>🗓</b><span>TKB</span></button></nav>
 <label class="vbfab" id="vbFab" title="Thêm ảnh">＋<input type="file" id="vbFile3" accept="image/*" multiple hidden></label>
 <main id="vision" hidden><div class="card" id="vb">
   <div class="row vbbar" id="vbBar" style="margin-bottom:10px"><label class="btn" style="cursor:pointer">📷 Thêm ảnh<input type="file" id="vbFile2" accept="image/*" multiple hidden></label><button class="btn ghost" id="vbText2">✎ Thẻ chữ</button><button class="btn ghost" id="vbTidy2" title="Xếp lại gọn từ góc trên bên trái">⇲ Xếp gọn</button></div>
@@ -1527,15 +1527,11 @@ sndUI();
 
 // ===== 2 mục: Trang chủ (vision board) / Việc & kế hoạch =====
 function showView(v){document.body.dataset.view=v;$('#home').hidden=v!=='home';$('#vision').hidden=v!=='vision';$('#board').hidden=v!=='work';$('#notes').hidden=v!=='notes';$('#focus').hidden=v!=='focus';$('#fun').hidden=v!=='fun';$('#tkb').hidden=v!=='tkb';
-  $$('#nav button,#bnav button[data-v],#moreSheet button[data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
-  $('#bnav [data-bn=more]').classList.toggle('on',!document.querySelector('#bnav button[data-v="'+v+'"]'));$('#moreSheet').hidden=true;window.scrollTo(0,0);
+  $$('#nav button,#bnav button[data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  window.scrollTo(0,0);
   if(v==='vision')requestAnimationFrame(()=>vbNorm(true));else if(v==='work')applyAll();else if(v==='notes')window.notesShow&&notesShow();else if(v==='focus')window.petShow&&petShow();else if(v==='fun')window.funShow&&funShow();else if(v==='tkb')window.rTT&&rTT();else requestAnimationFrame(hmBuild)}
 $('#nav').onclick=e=>{const b=e.target.closest('button');if(b)showView(b.dataset.v)};
-function bnGo(e){e.stopPropagation();const b=e.target.closest('button');if(!b){$('#moreSheet').hidden=true;return}
-  if(b.dataset.v)return showView(b.dataset.v);
-  const k=b.dataset.bn;if(k==='more'){$('#moreSheet').hidden=!$('#moreSheet').hidden;return}
-  $('#moreSheet').hidden=true;if(k==='cal')$('#calBtn').click();else if(k==='set')$('#theme').click()}
-$('#bnav').onclick=bnGo;$('#moreSheet').onclick=e=>{if(e.target===$('#moreSheet'))bnGo(e);else bnGo(e)};
+$('#bnav').onclick=e=>{e.stopPropagation();const b=e.target.closest('button');if(b&&b.dataset.v)showView(b.dataset.v)};
 function setWk(w){document.body.dataset.wk=w;$$('#wkTabs button').forEach(b=>b.classList.toggle('on',b.dataset.w===w))}
 function setFc(f){document.body.dataset.fc=f;$$('#fcTabs button').forEach(b=>b.classList.toggle('on',b.dataset.f===f))}
 $('#wkTabs').onclick=e=>{const b=e.target.closest('button');if(b){setWk(b.dataset.w);window.scrollTo(0,0)}};
