@@ -154,7 +154,7 @@ body{background-image:radial-gradient(color-mix(in srgb,var(--ink) 9%,transparen
 .addp{width:100%;border:1px dashed var(--line);background:none;border-radius:10px;padding:12px;color:var(--mute);cursor:pointer;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
 .pt[style]{border-left:3px solid var(--pc);padding-left:6px}
 .pt label,label.pt{cursor:pointer}
-@media(max-width:800px){.pgrid{grid-template-columns:1fr}}
+@media(max-width:800px){.pgrid{grid-template-columns:minmax(0,1fr)}}
 .prb{font:11px ui-monospace,Menlo,monospace;border:1px solid var(--line);background:none;border-radius:6px;padding:1px 6px;cursor:pointer;white-space:nowrap;font-style:normal}
 .p3{color:#e5484d;border-color:#e5484d}.p2{color:#d98a00;border-color:#d98a00}.p1{color:#2e9b5f;border-color:#2e9b5f}
 .tx{flex:1;min-width:0;border:0;background:none;padding:2px 0;font-size:14px}.tx.d{text-decoration:line-through;color:var(--mute)}
@@ -201,7 +201,13 @@ body{background-image:radial-gradient(color-mix(in srgb,var(--ink) 9%,transparen
 .lay.board{display:block}
 .vb{columns:160px}
 #plan{container-type:inline-size}
-@container (max-width:700px){.pgrid{grid-template-columns:1fr}}
+@container (max-width:700px){.pgrid{grid-template-columns:minmax(0,1fr)}}
+.pgrid>*{min-width:0}
+.proj,.ptask,.ptask .row,.dchips{min-width:0;max-width:100%}
+.ptask .pin{min-width:0}
+.dchips{flex-wrap:wrap}
+#plan .phead .row,#plan .pgrid .row{flex-wrap:wrap}
+#projs .row[style*="nowrap"],.ptask .row{flex-wrap:nowrap}
 @media(min-width:900px){
 .board{position:relative;height:var(--bh,1300px)}
 .board>.card,.board>.ov{position:absolute;left:calc(var(--x)*100%);top:calc(var(--y)*1px);width:calc(var(--w)*100% - 16px);height:calc(var(--h)*1px);margin:0}
