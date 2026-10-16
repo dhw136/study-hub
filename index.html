@@ -1548,30 +1548,34 @@ async function hmBuild(){const my=++hmTok;await hmLoad();if(my!==hmTok)return;
   const hw=he.offsetWidth,hh=he.offsetHeight,G=3;
   const avA=VB.reduce((s,v)=>s+hmA(v),0)/VB.length;
   let t=Math.max(50,Math.min(hmSz(),W/2));
-  t=Math.min(Math.max(t,Math.sqrt(Math.max(0,W*H-hw*hh)/(VB.length*avA))*1.05),t*1.35,H/2);
+  t=Math.min(Math.max(t,Math.sqrt(Math.max(0,W*H-hw*hh)/(VB.length*avA))*1.12),t*1.8,H/2);
   const rows=[],zone=(y0,y1,split)=>{const z=y1-y0;if(z<1)return;const n=Math.max(1,Math.round(z/t));
     const w=[...Array(n)].map(()=>.85+Math.random()*.35),sw=w.reduce((p,q)=>p+q,0);let y=y0;
     w.forEach(k=>{const h=z*k/sw;rows.push({y,h,split});y+=h})};
   let ty=(H-hh)/2-G;if(ty<t*.5)ty=0;
   const by=H-ty;zone(0,ty,false);zone(ty,by,true);zone(by,H,false);
   const x0=(W-hw)/2-G,x1=(W+hw)/2+G;
-  let pool=[];
+  let pool=[];const used=new Map(),Rm=.4*Math.hypot(W,H);
+  const dmin=(v,cx,cy)=>{const a=used.get(v.id);if(!a)return 1e9;let m=1e9;for(const p of a){const d=Math.hypot(cx-p[0],cy-p[1]);if(d<m)m=d}return m};
   const seg=(l,r,y,h)=>{const w=r-l;if(w<h*.6)return;const acc=[];let sum=0;
     for(let g=0;g<300;g++){if(!pool.length)pool=hmShuf(VB);let bi=0,bc=1e9;
-      for(let k=0;k<Math.min(8,pool.length);k++){const c=Math.abs((sum+hmA(pool[k]))*h-w);if(c<bc){bc=c;bi=k}}
-      if(acc.length&&bc>=Math.abs(sum*h-w))break;
+      for(let k=0;k<Math.min(14,pool.length);k++){const a=hmA(pool[k]),cx=l+(sum+a/2)*h,cy=y+h/2,
+        c=Math.abs((sum+a)*h-w)+Math.max(0,Rm-dmin(pool[k],cx,cy))*6;if(c<bc){bc=c;bi=k}}
+      if(acc.length&&Math.abs((sum+hmA(pool[bi]))*h-w)>=Math.abs(sum*h-w))break;
       sum+=hmA(pool[bi]);acc.push(pool.splice(bi,1)[0])}
     const k=w/(sum*h);let x=l;
     acc.forEach(v=>{const wd=hmA(v)*h*k,d=document.createElement('div');d.className='hmt';d._v=v;d._a=wd/h;
-      d.style.cssText=`left:${x+1.5}px;top:${y+1.5}px;width:${wd-3}px;height:${h-3}px`;T.appendChild(d);hmFill(d,v);hmSlots.push(d);x+=wd})};
+      d.style.cssText=`left:${x+1.5}px;top:${y+1.5}px;width:${wd-3}px;height:${h-3}px`;T.appendChild(d);hmFill(d,v);hmSlots.push(d);
+      (used.get(v.id)||used.set(v.id,[]).get(v.id)).push([x+wd/2,y+h/2]);x+=wd})};
   rows.forEach(r=>{if(r.split){seg(0,x0,r.y,r.h);seg(x1,W,r.y,r.h)}else seg(0,W,r.y,r.h)});
   he.style.top=(ty+G+(by-ty-2*G-hh)/2)+'px';he.style.transform='translateX(-50%)'}
 function hmSwap(){if(document.body.dataset.view!=='home'||!hmSlots.length)return;
   const pool=VB.filter(v=>!hmSlots.some(d=>d._v===v)),n=Math.max(1,Math.round(hmSlots.length/10)),
+    near=(d,v)=>hmSlots.some(e=>e!==d&&e._v===v&&Math.hypot(e.offsetLeft+e.offsetWidth/2-d.offsetLeft-d.offsetWidth/2,e.offsetTop+e.offsetHeight/2-d.offsetTop-d.offsetHeight/2)<Math.max(innerWidth,innerHeight)*.35),
     ch=(d,v)=>{d._v=v;d.style.opacity=0;setTimeout(()=>{hmFill(d,v);d.style.opacity=1},450)},ok=(a,b)=>Math.abs(a-b)<=.12*b;
-  for(let k=0;k<n;k++){const d=hmSlots[Math.random()*hmSlots.length|0],c=pool.filter(x=>ok(hmA(x),d._a));
+  for(let k=0;k<n;k++){const d=hmSlots[Math.random()*hmSlots.length|0],c=pool.filter(x=>ok(hmA(x),d._a)&&!near(d,x));
     if(c.length){const v=c[Math.random()*c.length|0];pool.splice(pool.indexOf(v),1);pool.push(d._v);ch(d,v)}
-    else if(hmSlots.length>1){const c2=hmSlots.filter(e=>e!==d&&ok(hmA(e._v),d._a)&&ok(hmA(d._v),e._a));if(!c2.length)continue;
+    else if(hmSlots.length>1){const c2=hmSlots.filter(e=>e!==d&&e._v!==d._v&&ok(hmA(e._v),d._a)&&ok(hmA(d._v),e._a)&&!near(d,e._v)&&!near(e,d._v));if(!c2.length)continue;
       const e=c2[Math.random()*c2.length|0],a=d._v,b=e._v;ch(d,b);ch(e,a)}}}
 (function loop(){hmSwap();setTimeout(loop,hmSec()*1000)})();
 $('#hmSz').value=hmSz();$('#hmSzV').textContent=hmSz();$('#hmSec').value=hmSec();$('#hmSecV').textContent=hmSec();
