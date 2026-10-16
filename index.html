@@ -463,6 +463,14 @@ textarea.tx{resize:none;overflow:hidden;display:block;width:auto;font-size:14px;
 .tt-ev{position:absolute;border-radius:6px;padding:2px 5px;font-size:11px;line-height:1.25;color:#fff;overflow:hidden;cursor:pointer;border:1px solid #0003;word-break:break-word}
 .tt-ev b{display:block;font:700 10px ui-monospace,Menlo,monospace}
 .tt-now{position:absolute;left:0;right:0;height:2px;background:#e5484d;z-index:2;pointer-events:none}
+/* ===== mục tiêu của vision board ===== */
+#vbCatBar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
+.vcc{border:1px solid var(--line);background:none;border-radius:99px;padding:5px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;color:var(--ink)}
+.vcc i{font-style:normal;font-size:11px;color:var(--mute)}
+.vcc.on{background:var(--acc2);border-color:var(--cc,var(--acc));font-weight:600}
+.vcc.add{border-style:dashed;color:var(--mute)}
+#vbGrid .vbg{position:absolute;left:6px;bottom:6px;max-width:calc(100% - 44px);border:0;border-radius:99px;color:#fff;padding:2px 8px;font-size:11px;line-height:1.4;opacity:.9;cursor:pointer;-webkit-appearance:none;appearance:none;z-index:3;text-overflow:ellipsis}
+#vbGrid .vbg option{color:var(--ink);background:var(--card)}
 /* ===== thanh trên cùng: 1 hàng, mọi mục cùng cỡ (desktop) ===== */
 @media(min-width:701px){
   header{flex-wrap:nowrap;gap:10px;padding:10px 16px;align-items:center}
@@ -505,6 +513,8 @@ textarea.tx{resize:none;overflow:hidden;display:block;width:auto;font-size:14px;
 <label class="vbfab" id="vbFab" title="Thêm ảnh">＋<input type="file" id="vbFile3" accept="image/*" multiple hidden></label>
 <main id="vision" hidden><div class="card" id="vb">
   <div class="row vbbar" id="vbBar" style="margin-bottom:10px"><label class="btn" style="cursor:pointer">📷 Thêm ảnh<input type="file" id="vbFile2" accept="image/*" multiple hidden></label><button class="btn ghost" id="vbText2">✎ Thẻ chữ</button><button class="btn ghost" id="vbTidy2" title="Xếp lại gọn từ góc trên bên trái">⇲ Xếp gọn</button></div>
+  <div id="vbCatBar"></div>
+  <div class="mute" style="margin:-2px 0 10px;font-size:13px">Mỗi mục tiêu có ảnh riêng. Ảnh thêm vào sẽ thuộc mục tiêu đang chọn (bấm nhãn ở góc ô để chuyển). Trang chủ tự chia đều ảnh giữa các mục tiêu.</div>
   <div class="mute vbhint" id="vbHint" style="margin:-4px 0 10px">Chạm giữ một ô rồi kéo để đổi chỗ · kéo góc ◢ để đổi cỡ.</div>
   <div class="row" id="vbMake" style="display:none;margin-bottom:10px"><input id="vbT" class="grow" placeholder="Câu / mục tiêu muốn nhìn thấy mỗi ngày…"><select id="vbC"></select><button class="btn" id="vbAdd">Thêm</button><button class="btn ghost" id="vbCancel">Huỷ</button></div>
   <div class="vbstage">
@@ -980,6 +990,14 @@ $('#goals').onclick=e=>{const gp=e.target.closest('[data-gpri]');if(gp){const g=
 $('#goals').onkeydown=e=>{const a=e.target.dataset.madd,v=e.target.value.trim();if(a&&e.key==='Enter'&&v){gg(a).ms.push({id:uid(),t:v,d:0});fM=a;save();rGoals()}};
 
 // VISION
+S.vbCats=Array.isArray(S.vbCats)&&S.vbCats.length?S.vbCats:[{id:'g0',n:'Chung',c:PC[0]}];S.vbCur=S.vbCur||'';
+const vbCat=id=>S.vbCats.find(c=>c.id===id)||S.vbCats[0];
+const vbTarget=()=>S.vbCats.some(c=>c.id===S.vbCur)?S.vbCur:S.vbCats[0].id;
+function vbMig(){let ch=false;if(S.vbCur&&!S.vbCats.some(c=>c.id===S.vbCur))S.vbCur='';
+  VB.forEach(v=>{if(!v.g||!S.vbCats.some(c=>c.id===v.g)){v.g=S.vbCats[0].id;ch=true}});if(ch)saveVB()}
+function vbSel(v){const c=vbCat(v.g);return `<select class="vbg" data-vg="${v.id}" style="background:${c.c}" title="Mục tiêu">${S.vbCats.map(k=>`<option value="${k.id}" ${k.id===v.g?'selected':''}>${esc(k.n)}</option>`).join('')}</select>`}
+function rVC(){const n={};VB.forEach(v=>n[v.g]=(n[v.g]||0)+1);
+  $('#vbCatBar').innerHTML=`<button class="vcc ${!S.vbCur?'on':''}" data-vcc="">Tất cả <i>${VB.length}</i></button>`+S.vbCats.map(c=>`<button class="vcc ${S.vbCur===c.id?'on':''}" data-vcc="${c.id}" style="--cc:${c.c}"><span class="dot" style="background:${c.c}"></span>${esc(c.n)} <i>${n[c.id]||0}</i></button>`).join('')+`<button class="vcc add" data-vcadd="1">+ Mục tiêu</button>`+(S.vbCur?`<button class="vcc" data-vcren="1" title="Đổi tên mục tiêu">✎</button><button class="vcc" data-vcdel="1" title="Xoá mục tiêu">🗑</button>`:'')}
 const VG={'Cam':['#b5482f','#e8a06a'],'Xanh lá':['#3f6b5a','#9cc7b2'],'Xanh dương':['#3b6ea5','#9cc3ee'],'Tím':['#7a4f9b','#d3a9ee'],'Hồng':['#c2576b','#f3b3bf'],'Đen':['#23211e','#6b645a']};
 let VB=[],dragId=null;try{VB=JSON.parse(localStorage.getItem('studyhub_vb')||'[]')}catch(e){}
 // Ảnh vision board lưu trong IndexedDB (chứa được hàng trăm MB), không còn bị giới hạn ~5MB của localStorage
@@ -998,9 +1016,9 @@ function saveVB(){vbPersist();if(window._schedVB)_schedVB();return true}
 const vbBase=()=>{const t=S.vbSize||180;return innerWidth<600?Math.min(t,Math.floor((innerWidth-24)/2)):t};
 const tfs=(v,w)=>Math.round((v.t.length>60?15:v.t.length>25?19:25)*Math.min(2.2,Math.max(.75,w/180)));
 const vbRes='<i class="vbr" data-vr="1" title="Kéo để đổi cỡ · bấm đúp để về mặc định">◢</i>';
-function rVB(){const g=$('#vbGrid');g.style.setProperty('--vbw',vbBase()+'px');g.classList.add('pend');
-  g.innerHTML=VB.map(v=>{const pos=v.x!=null?`left:${v.x}px;top:${v.y}px;`:'';
-    return v.k==='img'?`<div class="vbi" data-id="${v.id}" style="${pos}--s:${v.s||1}"><div class="vbc"><img src="${v.src}" alt="" draggable="false"></div><button class="vbx vbcut" data-vc="${v.id}" title="Xén ảnh">✂</button><button class="vbx" data-vd="${v.id}">✕</button>${vbRes}</div>`:`<div class="vbi vbt" data-id="${v.id}" style="${pos}--s:${v.s||1};background:linear-gradient(135deg,${v.c[0]},${v.c[1]});font-size:${tfs(v,vbBase()*(v.s||1))}px">${esc(v.t)}<button class="vbx" data-vd="${v.id}">✕</button>${vbRes}</div>`}).join('')||'<p class="mute" style="padding:12px">Chưa có gì. Thêm ảnh về ước mơ, nơi bạn muốn đến, điểm số muốn đạt…</p>';
+function rVB(){vbMig();rVC();const g=$('#vbGrid');g.style.setProperty('--vbw',vbBase()+'px');g.classList.add('pend');
+  g.innerHTML=(S.vbCur?VB.filter(v=>v.g===S.vbCur):VB).map(v=>{const pos=v.x!=null?`left:${v.x}px;top:${v.y}px;`:'';
+    return v.k==='img'?`<div class="vbi" data-id="${v.id}" style="${pos}--s:${v.s||1}"><div class="vbc"><img src="${v.src}" alt="" draggable="false"></div><button class="vbx vbcut" data-vc="${v.id}" title="Xén ảnh">✂</button><button class="vbx" data-vd="${v.id}">✕</button>${vbSel(v)}${vbRes}</div>`:`<div class="vbi vbt" data-id="${v.id}" style="${pos}--s:${v.s||1};background:linear-gradient(135deg,${v.c[0]},${v.c[1]});font-size:${tfs(v,vbBase()*(v.s||1))}px">${esc(v.t)}<button class="vbx" data-vd="${v.id}">✕</button>${vbSel(v)}${vbRes}</div>`}).join('')||'<p class="mute" style="padding:12px">Chưa có gì. Thêm ảnh về ước mơ, nơi bạn muốn đến, điểm số muốn đạt…</p>';
   Promise.all([...g.querySelectorAll('img')].map(i=>i.decode?i.decode().catch(()=>{}):0)).then(()=>{g.querySelectorAll('.vbi').forEach(el=>{const v=VB.find(x=>x.id===el.dataset.id);if(v&&v.k==='img')vbApplyCrop(el,v)});vbNorm(true);g.classList.remove('pend')})}
 function vbApplyCrop(el,v){const im=el.querySelector('img'),c=el.querySelector('.vbc');if(!im||!c)return;
   if(!v.cr||!im.naturalWidth){c.style.aspectRatio='';im.style.cssText='';return}
@@ -1009,7 +1027,7 @@ function vbApplyCrop(el,v){const im=el.querySelector('img'),c=el.querySelector('
 function addFiles(fs){[...fs].filter(f=>f.type.startsWith('image/')).forEach(f=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{
   const k=Math.min(1,720/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);
   const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);
-  VB.push({id:uid(),k:'img',src:c.toDataURL('image/jpeg',.72)});if(!saveVB())VB.pop();rVB()};im.src=r.result};r.readAsDataURL(f)})}
+  VB.push({id:uid(),k:'img',g:vbTarget(),src:c.toDataURL('image/jpeg',.72)});if(!saveVB())VB.pop();rVB()};im.src=r.result};r.readAsDataURL(f)})}
 $('#vbFile').onchange=e=>{addFiles(e.target.files);e.target.value=''};
 ['#vbFile2','#vbFile3'].forEach(i=>$(i).onchange=e=>{addFiles(e.target.files);e.target.value=''});
 $('#vbText2').onclick=()=>{$('#vbMake').style.display='flex';$('#vbT').focus()};
@@ -1017,10 +1035,20 @@ document.addEventListener('paste',e=>{const f=[...(e.clipboardData?e.clipboardDa
 $('#vb').ondragover=e=>e.preventDefault();
 $('#vb').ondrop=e=>{e.preventDefault();if(e.dataTransfer.files.length)addFiles(e.dataTransfer.files)};
 $('#vbGrid').onclick=e=>{const d=e.target.dataset.vd,c=e.target.dataset.vc;if(d){VB=VB.filter(v=>v.id!==d);saveVB();rVB()}else if(c){const it=e.target.closest('.vbi');if(it)vbCE(it)}};
+$('#vbCatBar').onclick=e=>{const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+  if(d.vcc!==undefined){S.vbCur=d.vcc;save();rVB();return}
+  if(d.vcadd){const n=(prompt('Tên mục tiêu (vd: Du học, IELTS 7.0, Sức khoẻ…)')||'').trim();if(!n)return;
+    const id=uid();S.vbCats.push({id,n,c:PC[S.vbCats.length%PC.length]});S.vbCur=id;save();rVB();return}
+  if(d.vcren){const c=vbCat(S.vbCur),n=(prompt('Tên mục tiêu',c.n)||'').trim();if(!n)return;c.n=n;save();rVB();return}
+  if(d.vcdel){if(S.vbCats.length<2){alert('Cần giữ lại ít nhất một mục tiêu.');return}
+    const c=vbCat(S.vbCur),o=S.vbCats.find(k=>k.id!==c.id);
+    if(!confirm('Xoá mục tiêu “'+c.n+'”? Các ảnh trong đó sẽ được chuyển sang “'+o.n+'”.'))return;
+    VB.forEach(v=>{if(v.g===c.id)v.g=o.id});S.vbCats=S.vbCats.filter(k=>k.id!==c.id);S.vbCur='';save();saveVB();rVB()}};
+$('#vbGrid').addEventListener('change',e=>{const s=e.target.closest('.vbg');if(!s)return;const v=VB.find(x=>x.id===s.dataset.vg);if(!v)return;v.g=s.value;saveVB();rVB()});
 $('#vbC').innerHTML=Object.keys(VG).map(k=>`<option>${k}</option>`).join('');
 $('#vbText').onclick=()=>{$('#set').close();showView('vision');$('#vbMake').style.display='flex';$('#vbT').focus()};
 $('#vbCancel').onclick=()=>{$('#vbMake').style.display='none'};
-function addTxt(t,c){VB.push({id:uid(),k:'txt',t,c:VG[c]||VG['Cam']});saveVB();rVB()}
+function addTxt(t,c){VB.push({id:uid(),k:'txt',g:vbTarget(),t,c:VG[c]||VG['Cam']});saveVB();rVB()}
 $('#vbAdd').onclick=()=>{const t=$('#vbT').value.trim();if(!t)return;addTxt(t,$('#vbC').value);$('#vbT').value=''};
 $('#vbT').onkeydown=e=>{if(e.key==='Enter')$('#vbAdd').click()};
 $('#qVb').onclick=()=>{addTxt($('#quote').textContent.replace(/[“”]/g,''),Object.keys(VG)[Math.floor(Math.random()*6)]);$('#qVb').textContent='Đã thêm ✓';setTimeout(()=>$('#qVb').textContent='+ Vision board',1400)};
@@ -1383,7 +1411,7 @@ let vbArm=false;
 vbGrid.addEventListener('touchmove',ev=>{if(vbArm&&ev.cancelable)ev.preventDefault()},{passive:false});
 if(matchMedia('(pointer:coarse)').matches)vbGrid.addEventListener('contextmenu',e=>{if(e.target.closest('.vbi'))e.preventDefault()});
 vbGrid.addEventListener('pointerdown',e=>{
-  if(e.button>0||e.target.closest('.vbr,.vbx,.vch'))return;
+  if(e.button>0||e.target.closest('.vbr,.vbx,.vch,.vbg'))return;
   const it=e.target.closest('.vbi');if(!it)return;const v=VB.find(x=>x.id===it.dataset.id);if(!v)return;
   const sx=e.clientX,sy=e.clientY,x0=it.offsetLeft,y0=it.offsetTop,w=it.offsetWidth,h=it.offsetHeight,id=v.id;
   const els={},orig=vbEls(id).map(el=>{els[el.dataset.id]=el;return Object.assign({id:el.dataset.id},vbRect(el))});
@@ -1556,13 +1584,18 @@ async function hmBuild(){const my=++hmTok;await hmLoad();if(my!==hmTok)return;
   const by=H-ty;zone(0,ty,false);zone(ty,by,true);zone(by,H,false);
   const x0=(W-hw)/2-G,x1=(W+hw)/2+G;
   let pool=[];const used=new Map(),Rm=.4*Math.hypot(W,H);
+  // chia đều: luôn lấy ảnh từ mục tiêu đang có ít ô nhất, nên không mục tiêu nào bị thiếu
+  const cats=[...new Set(VB.map(v=>v.g||''))],cc={};cats.forEach(c=>cc[c]=0);
+  const nextCands=()=>{const mn=Math.min(...cats.map(c=>cc[c])),lo=cats.filter(c=>cc[c]===mn),c=lo[Math.random()*lo.length|0];
+    if(!pool.some(v=>(v.g||'')===c))pool.push(...hmShuf(VB.filter(v=>(v.g||'')===c)));
+    return pool.filter(v=>(v.g||'')===c)};
   const dmin=(v,cx,cy)=>{const a=used.get(v.id);if(!a)return 1e9;let m=1e9;for(const p of a){const d=Math.hypot(cx-p[0],cy-p[1]);if(d<m)m=d}return m};
   const seg=(l,r,y,h)=>{const w=r-l;if(w<h*.6)return;const acc=[];let sum=0;
-    for(let g=0;g<300;g++){if(!pool.length)pool=hmShuf(VB);let bi=0,bc=1e9;
-      for(let k=0;k<Math.min(14,pool.length);k++){const a=hmA(pool[k]),cx=l+(sum+a/2)*h,cy=y+h/2,
-        c=Math.abs((sum+a)*h-w)+Math.max(0,Rm-dmin(pool[k],cx,cy))*6;if(c<bc){bc=c;bi=k}}
-      if(acc.length&&Math.abs((sum+hmA(pool[bi]))*h-w)>=Math.abs(sum*h-w))break;
-      sum+=hmA(pool[bi]);acc.push(pool.splice(bi,1)[0])}
+    for(let g=0;g<300;g++){const cd=nextCands().slice(0,14);let bv=cd[0],bc=1e9;
+      cd.forEach(p=>{const a=hmA(p),cx=l+(sum+a/2)*h,cy=y+h/2,
+        c=Math.abs((sum+a)*h-w)+Math.max(0,Rm-dmin(p,cx,cy))*6;if(c<bc){bc=c;bv=p}});
+      if(acc.length&&Math.abs((sum+hmA(bv))*h-w)>=Math.abs(sum*h-w))break;
+      sum+=hmA(bv);acc.push(bv);pool.splice(pool.indexOf(bv),1);cc[bv.g||'']++}
     const k=w/(sum*h);let x=l;
     acc.forEach(v=>{const wd=hmA(v)*h*k,d=document.createElement('div');d.className='hmt';d._v=v;d._a=wd/h;
       d.style.cssText=`left:${x+1.5}px;top:${y+1.5}px;width:${wd-3}px;height:${h-3}px`;T.appendChild(d);hmFill(d,v);hmSlots.push(d);
@@ -1573,7 +1606,7 @@ function hmSwap(){if(document.body.dataset.view!=='home'||!hmSlots.length)return
   const pool=VB.filter(v=>!hmSlots.some(d=>d._v===v)),n=Math.max(1,Math.round(hmSlots.length/10)),
     near=(d,v)=>hmSlots.some(e=>e!==d&&e._v===v&&Math.hypot(e.offsetLeft+e.offsetWidth/2-d.offsetLeft-d.offsetWidth/2,e.offsetTop+e.offsetHeight/2-d.offsetTop-d.offsetHeight/2)<Math.max(innerWidth,innerHeight)*.35),
     ch=(d,v)=>{d._v=v;d.style.opacity=0;setTimeout(()=>{hmFill(d,v);d.style.opacity=1},450)},ok=(a,b)=>Math.abs(a-b)<=.12*b;
-  for(let k=0;k<n;k++){const d=hmSlots[Math.random()*hmSlots.length|0],c=pool.filter(x=>ok(hmA(x),d._a)&&!near(d,x));
+  for(let k=0;k<n;k++){const d=hmSlots[Math.random()*hmSlots.length|0],c=pool.filter(x=>ok(hmA(x),d._a)&&!near(d,x)&&(x.g||'')===(d._v.g||''));
     if(c.length){const v=c[Math.random()*c.length|0];pool.splice(pool.indexOf(v),1);pool.push(d._v);ch(d,v)}
     else if(hmSlots.length>1){const c2=hmSlots.filter(e=>e!==d&&e._v!==d._v&&ok(hmA(e._v),d._a)&&ok(hmA(d._v),e._a)&&!near(d,e._v)&&!near(e,d._v));if(!c2.length)continue;
       const e=c2[Math.random()*c2.length|0],a=d._v,b=e._v;ch(d,b);ch(e,a)}}}
@@ -1641,7 +1674,7 @@ RX.push(
  [/(\d+) mìn/g,'$1 mines'],[/^Dễ ·/,'Easy ·'],[/^Vừa ·/,'Medium ·'],[/^Khó \(Expert\)/,'Hard (Expert)'],[/^Siêu khó ·/,'Insane ·'],
  [/rất khó/g,'very hard'],[/chuẩn/g,'standard'],[/rất dễ/g,'very easy'],[/· dễ$/,'· easy']);
 try{[["Mũ chóp", "Top hat"], ["Vương miện", "Crown"], ["Mũ tốt nghiệp", "Graduation cap"], ["Mũ lưỡi trai", "Cap"], ["Mũ rộng vành", "Wide-brim hat"], ["Mũ cứu hộ", "Hard hat"], ["Mũ lính", "Soldier helmet"], ["Nơ", "Bow"], ["Hoa anh đào", "Cherry blossom"], ["Hoa hướng dương", "Sunflower"], ["Mũ Noel", "Santa hat"], ["Mũ nấm", "Mushroom hat"], ["Bóng bay", "Balloon"], ["Gà con", "Chick"], ["Cầu vồng", "Rainbow"], ["Ngôi sao", "Star"], ["Kính râm", "Sunglasses"], ["Kính cận", "Glasses"], ["Kính bơi", "Goggles"], ["Kính mũi râu", "Disguise glasses"], ["Kính lúp", "Magnifier"], ["Khăn len", "Scarf"], ["Huy chương", "Medal"], ["Chuỗi hạt", "Beads"], ["Chuông nhỏ", "Little bell"], ["Ruy-băng", "Ribbon"], ["Huy chương vàng", "Gold medal"], ["Kim cương", "Diamond"], ["Nơ bướm", "Bow tie"], ["Bùa may mắn", "Lucky charm"], ["Cỏ bốn lá", "Four-leaf clover"], ["Áo thun", "T-shirt"], ["Sơ mi", "Shirt"], ["Áo khoác", "Jacket"], ["Áo blouse", "Lab coat"], ["Áo phản quang", "Hi-vis vest"], ["Váy", "Dress"], ["Võ phục", "Martial arts gi"], ["Áo thể thao", "Sports jersey"], ["Đồ bơi", "Swimsuit"], ["Ba lô", "Backpack"], ["Bóng đá", "Football"], ["Bóng rổ", "Basketball"], ["Gấu bông", "Teddy bear"], ["Sách", "Books"], ["Chậu cây", "Potted plant"], ["Cà phê", "Coffee"], ["Trà xanh", "Green tea"], ["Diều", "Kite"], ["Bảng màu", "Palette"], ["Tai nghe", "Headphones"], ["Đũa phép", "Magic wand"], ["Máy chơi game", "Game console"], ["Kèn", "Trumpet"], ["Ván trượt", "Skateboard"], ["Vĩ cầm", "Violin"], ["Kính thiên văn", "Telescope"], ["Cúp", "Trophy"], ["Mèo", "Cat"], ["Cún", "Dog"], ["Thỏ", "Rabbit"], ["Ếch", "Frog"], ["Cáo", "Fox"], ["Gấu nâu", "Brown bear"], ["Gấu trúc", "Panda"], ["Cánh cụt", "Penguin"], ["Sư tử", "Lion"], ["Hổ", "Tiger"], ["Kỳ lân", "Unicorn"], ["Rồng", "Dragon"], ["Cam", "Orange"], ["Nho", "Grapes"], ["Đã sở hữu", "Owned"], ["Đang chọn ✓", "Selected ✓"], ["Chọn", "Select"], ["Cởi ra", "Take off"], ["Mặc", "Wear"], ["Chưa đủ xu — học thêm một chút nhé 📚", "Not enough coins — study a bit more 📚"], ["Đói quá rồi, cho ăn đi bạn ơi! 🥺", "I'm so hungry, please feed me! 🥺"], ["Hơi đói bụng… 🍽️", "A bit hungry… 🍽️"], ["Buồn buồn, học bài để vui lên nhé 📚", "Feeling a bit sad, study to cheer me up 📚"], ["💥 Nổ mìn rồi! Thử lại nhé", "💥 Boom! Try again"], ["😵 Hết nước đi!", "😵 No moves left!"], ["🎉 Đã đạt 2048! Chơi tiếp được nhé", "🎉 You reached 2048! You can keep playing"], ["Tết Dương lịch", "New Year's Day"], ["Quốc tế Phụ nữ", "International Women's Day"], ["Giải phóng miền Nam", "Reunification Day"], ["Quốc tế Lao động", "International Labour Day"], ["Quốc tế Thiếu nhi", "Children's Day"], ["Quốc khánh", "National Day"], ["Ngày Phụ nữ Việt Nam", "Vietnamese Women's Day"], ["Ngày Nhà giáo Việt Nam", "Vietnamese Teachers' Day"], ["Giáng sinh", "Christmas"], ["Rằm tháng Giêng", "Lantern Festival"], ["Giỗ Tổ Hùng Vương", "Hung Kings' Festival"], ["Lễ Phật Đản", "Vesak"], ["Tết Đoan Ngọ", "Double Fifth Festival"], ["Lễ Vu Lan", "Vu Lan Festival"], ["Tết Trung Thu", "Mid-Autumn Festival"], ["Ông Táo chầu trời", "Kitchen Gods' Day"], ["Cắt ảnh", "Crop image"], ["Tự do", "Free"], ["Gốc", "Original"], ["Task nhỏ đã xong", "Subtask done"], ["Task nhỏ hơn đã xong", "Sub-subtask done"], ["Thêm task nhỏ hơn", "Add sub-subtask"], ["Document PiP lỗi, dùng video PiP", "Document PiP failed, using video PiP"], ["File không phải bản sao lưu của Study Hub.", "This file is not a Study Hub backup."], ["Không khôi phục được (bộ nhớ trình duyệt đầy).", "Couldn't restore (browser storage is full)."], ["Không lưu được ảnh (bộ nhớ trình duyệt/ổ đĩa đầy hoặc bị chặn). Hãy xoá bớt ảnh hoặc giải phóng dung lượng.", "Couldn't save the images (browser storage/disk is full or blocked). Delete some images or free up space."], ["Đã thêm ✓", "Added ✓"], ["Sai email hoặc mật khẩu.", "Wrong email or password."], ["Sai mật khẩu.", "Wrong password."], ["Email chưa có tài khoản.", "No account with this email."], ["Email này đã có tài khoản, hãy bấm Đăng nhập.", "This email already has an account, click Sign in."], ["Mật khẩu cần ít nhất 6 ký tự.", "Password needs at least 6 characters."], ["Email không hợp lệ.", "Invalid email."], ["Bạn đã đóng cửa sổ đăng nhập.", "You closed the sign-in window."], ["Tên miền này chưa được thêm vào Authorized domains trong Firebase.", "This domain hasn't been added to Authorized domains in Firebase."], ["Không có mạng.", "No network."], ["Thử quá nhiều lần, hãy đợi một lúc.", "Too many attempts, please wait a moment."], ["mới sửa", "edited"], ["Đang kiểm tra dữ liệu…", "Checking data…"], ["Không tải được thư viện Firebase. Hãy kiểm tra mạng và mở app qua https.", "Couldn't load the Firebase library. Check your network and open the app over https."], ["Nhập email trước rồi bấm lại.", "Enter your email first, then click again."], ["Đã gửi email đặt lại mật khẩu.", "Password reset email sent."], ["Ngoại tuyến — sẽ đồng bộ khi có mạng", "Offline — will sync when back online"], ["Đã có mạng, đang đồng bộ…", "Back online, syncing…"], ["Xoá trang này?", "Delete this page?"], ["Tài khoản này đã có dữ liệu trên đám mây.\n\nOK = dùng dữ liệu trên đám mây (dữ liệu trên máy này được lưu một bản sao lưu).\nHuỷ = giữ dữ liệu trên máy này và ghi đè lên đám mây.", "This account already has data in the cloud.\n\nOK = use the cloud data (the data on this device is saved as a backup).\nCancel = keep this device's data and overwrite the cloud."]].forEach(([a,b])=>LD.set(a,b))}catch(e){}
-LD.set('Lịch học','Class');LD.set('Xén ảnh','Crop image');LD.set('Cổ','Neck');
+LD.set('Lịch học','Class');LD.set('Tất cả','All');LD.set('+ Mục tiêu','+ Goal');LD.set('Xén ảnh','Crop image');LD.set('Cổ','Neck');
 RX.push([/Tết Nguyên Đán \(mùng (\d)\)/g,'Lunar New Year (day $1)'],[/^Đã mua /,'Bought '],[/^Chào /,'Hi '],[/Hoàn thành/g,'Done'],[/Thắng /g,'Won '],[/kỷ lục mới/g,'new record'],[/^(Lỗi đồng bộ|Lỗi): /,'Error: '],[/^Phiên (\d)/,'Session $1'],[/Lỗi: /g,'Error: ']);
 if(S.lang==='en'){unTree(document.body);trTree(document.body)}
 
