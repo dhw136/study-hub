@@ -492,6 +492,8 @@ textarea.tx{resize:none;overflow:hidden;display:block;width:auto;font-size:14px;
 @media(min-width:701px) and (max-width:1250px){header .htm span,header .hclk{display:none}}
 #hmHero{display:flex;flex-direction:column;justify-content:center}
 .tt-ev.o{border:1px dashed #fff9;opacity:.88}
+.tt-ade{color:#fff;border-radius:6px;padding:2px 6px;font-size:11px;line-height:1.3;margin:1px 0;cursor:pointer;word-break:break-word;border:1px solid #0003}
+.tt-ade.o{border:1px dashed #fff9;opacity:.88}
 
 </style>
 </head>
@@ -625,7 +627,7 @@ textarea.tx{resize:none;overflow:hidden;display:block;width:auto;font-size:14px;
   </div>
 </div></main>
 <main id="tkb" hidden><div class="card">
-  <div class="tt-bar"><h2 style="margin:0" class="grow">🗓 Thời khóa biểu</h2><button class="btn ghost" id="ttPrev">‹</button><b id="ttLbl" style="min-width:110px;text-align:center"></b><button class="btn ghost" id="ttNext">›</button><button class="btn ghost" id="ttNow">Tuần này</button><button class="btn" id="ttAdd">+ Thêm lịch học</button><button class="btn ghost" id="ttAddE">+ Thêm sự kiện</button></div>
+  <div class="tt-bar"><h2 style="margin:0" class="grow">🗓 Thời khóa biểu</h2><button class="btn ghost" id="ttPrev">‹</button><b id="ttLbl" style="min-width:110px;text-align:center"></b><button class="btn ghost" id="ttNext">›</button><button class="btn ghost" id="ttNow">Tuần này</button><button class="btn" id="ttAdd">+ Thêm lịch học</button><button class="btn ghost" id="ttAddE">+ Thêm sự kiện</button><button class="btn ghost" id="ttAddA">+ Sự kiện cả ngày</button></div>
   <div class="mute" style="margin-bottom:8px">Thêm lịch học (nền đặc) và sự kiện (viền nét đứt) tại đây. Cả hai vẫn hiện trong Việc &amp; kế hoạch và lịch ở trang chủ.</div>
   <div class="tt-wrap"><div class="tt-g" id="ttG"></div></div>
 </div></main>
@@ -667,6 +669,7 @@ textarea.tx{resize:none;overflow:hidden;display:block;width:auto;font-size:14px;
   <h2 id="evH" style="margin:0 0 8px">Thêm lịch trình</h2>
   <label>Tiêu đề</label><input id="evT" placeholder="Ví dụ: Học Toán, Khám răng, Đi chơi…">
   <label>Ngày</label><input type="date" id="evD">
+  <label>Đến ngày (sự kiện nhiều ngày, tuỳ chọn)</label><input type="date" id="evD2">
   <div id="pcBox" hidden>
     <div class="seg" id="pcTab"><button type="button" data-k="neu" class="on">NEU</button><button type="button" data-k="uet">UET</button></div>
     <div id="pcNeu">
@@ -683,8 +686,9 @@ textarea.tx{resize:none;overflow:hidden;display:block;width:auto;font-size:14px;
     </div>
     <div class="mute" id="pcInfo" style="min-height:20px"></div>
   </div>
+  <label style="display:flex;gap:8px;align-items:center;color:var(--ink);margin-top:10px"><input type="checkbox" id="evAD" style="width:auto"> Cả ngày</label>
   <div class="row"><div class="grow"><label>Từ giờ</label><input type="time" id="evS"></div><div class="grow"><label>Đến giờ</label><input type="time" id="evE"></div></div>
-  <div class="mute" style="margin-top:4px">Để trống giờ nếu là sự kiện cả ngày.</div>
+  <div class="mute" style="margin-top:4px">Tick “Cả ngày” nếu không có giờ cụ thể.</div>
   <div class="row"><div class="grow"><label>Lặp lại</label><select id="evR"><option value="none">Không lặp</option><option value="day">Hằng ngày</option><option value="week">Hằng tuần (cùng thứ)</option><option value="month">Hằng tháng (cùng ngày)</option></select></div><div class="grow"><label>Màu</label><input type="color" id="evC"></div></div>
   <label>Lặp đến ngày (tuỳ chọn)</label><input type="date" id="evU">
   <label>Ghi chú / địa điểm</label><input id="evN">
@@ -1161,21 +1165,26 @@ function holOf(k){const a=[];if(HOL_S[k.slice(5)])a.push(HOL_S[k.slice(5)]);cons
 // ===== LỊCH TRÌNH CÁ NHÂN =====
 S.events=S.events||[];
 const evBy=id=>S.events.find(z=>z.id===id);
-function occ(x,k){if(k<x.d||(x.u&&k>x.u))return false;const r=x.r||'none';if(r==='none')return k===x.d;if(r==='day')return true;
+function occ(x,k){if(k<x.d||(x.u&&k>x.u))return false;const r=x.r||'none';if(r==='none')return k<=(x.d2||x.d);if(r==='day')return true;
   const a=new Date(x.d+'T00:00'),b=new Date(k+'T00:00');return r==='week'?a.getDay()===b.getDay():r==='month'?a.getDate()===b.getDate():false}
 const evsOn=k=>S.events.filter(x=>occ(x,k)).sort((a,b)=>(a.s||'')<(b.s||'')?-1:(a.s||'')>(b.s||'')?1:0);
+const spanTag=(x,k)=>{if(!x.d2)return '';const n=Math.round((new Date(x.d2+'T00:00')-new Date(x.d+'T00:00'))/864e5)+1,i=Math.round((new Date(k+'T00:00')-new Date(x.d+'T00:00'))/864e5)+1;return ' <small>('+i+'/'+n+')</small>'};
 const evTm=x=>x.s?(x.e?x.s+'–'+x.e:x.s):'Cả ngày';
-const evLine=x=>`<div class="evr" data-ev="${x.id}" style="--ec:${x.c||'#3b6ea5'}"><b>${evTm(x)}</b><span>${esc(x.t)}</span>${x.n?`<small class="mute">${esc(x.n)}</small>`:''}${x.r&&x.r!=='none'?'<small class="mute">↻</small>':''}</div>`;
+const evLine=x=>`<div class="evr" data-ev="${x.id}" style="--ec:${x.c||'#3b6ea5'}"><b>${evTm(x)}</b><span>${esc(x.t)}</span>${x.n?`<small class="mute">${esc(x.n)}</small>`:''}${x.d2?`<small class="mute">→ ${x.d2.slice(8)}/${x.d2.slice(5,7)}</small>`:''}${x.r&&x.r!=='none'?'<small class="mute">↻</small>':''}</div>`;
 const evMini=x=>`<div class="pev" data-ev="${x.id}" style="border-color:${x.c||'#3b6ea5'}">${x.s?`<b>${x.s}</b> `:''}${esc(x.t)}</div>`;
 let evId=null,evIsL=false;
-function openEv(id,date,cls){evId=id;const x=id?evBy(id):{t:'',d:date||tDay,s:'',e:'',c:'#3b6ea5',r:'none',u:'',n:'',l:cls?1:0};if(!x)return;
-  $('#evT').value=x.t;$('#evD').value=x.d;$('#evS').value=x.s||'';$('#evE').value=x.e||'';$('#evC').value=x.c||'#3b6ea5';$('#evR').value=x.r||'none';$('#evU').value=x.u||'';$('#evN').value=x.n||'';evIsL=!!x.l;$('#pcBox').hidden=!evIsL;
+function openEv(id,date,cls,allDay){evId=id;const x=id?evBy(id):{t:'',d:date||tDay,s:'',e:'',c:'#3b6ea5',r:'none',u:'',n:'',l:cls?1:0};if(!x)return;
+  $('#evT').value=x.t;$('#evD').value=x.d;$('#evD2').value=x.d2||'';$('#evS').value=x.s||'';$('#evE').value=x.e||'';$('#evC').value=x.c||'#3b6ea5';$('#evR').value=x.r||'none';$('#evU').value=x.u||'';$('#evN').value=x.n||'';evIsL=!!x.l;$('#pcBox').hidden=!evIsL;
   $('#evDel').style.display=id?'':'none';$('#evH').textContent=id?(evIsL?'Sửa lịch học':'Sửa lịch trình'):(evIsL?'Thêm lịch học':'Thêm lịch trình');
-  syncPc();pcAuto();if(!$('#evdlg').open)$('#evdlg').showModal();if(!id)$('#evT').focus()}
+  $('#evAD').checked=id?!x.s:!!allDay;adSync();pcAuto();if(!$('#evdlg').open)$('#evdlg').showModal();if(!id)$('#evT').focus()}
+function adSync(){const a=$('#evAD').checked;$('#evS').disabled=$('#evE').disabled=a;if(a){$('#evS').value='';$('#evE').value=''}syncPc()}
+$('#evAD').onchange=adSync;
+$('#evD2').oninput=e=>{if(e.target.value){$('#evAD').checked=true;adSync();$('#evR').value='none'}};
 function evRefresh(){rPlan();rHev();if(!$('#calPop').hidden)rCal();window.rTT&&rTT()}
 $('#evSave').onclick=()=>{const t=$('#evT').value.trim(),d=$('#evD').value;if(!t){$('#evT').focus();return}if(!d){$('#evD').focus();return}
   const a=$('#evS').value,b=$('#evE').value;if(a&&b&&b<a){alert('Giờ kết thúc phải sau giờ bắt đầu');return}
-  const o={t,d,s:a,e:b,c:$('#evC').value,r:$('#evR').value,u:$('#evU').value,n:$('#evN').value.trim(),l:evIsL?1:0};
+  const d2=$('#evD2').value;if(d2&&d2<d){alert('Ngày kết thúc phải sau ngày bắt đầu');return}
+  const o={t,d,d2:d2&&d2>d?d2:'',s:d2?'':a,e:d2?'':b,c:$('#evC').value,r:d2?'none':$('#evR').value,u:d2?'':$('#evU').value,n:$('#evN').value.trim(),l:evIsL?1:0};
   if(evId&&evBy(evId))Object.assign(evBy(evId),o);else S.events.push(Object.assign({id:uid()},o));
   save();$('#evdlg').close();evRefresh()};
 $('#evDel').onclick=()=>{const x=evBy(evId);if(!x)return;if(x.r&&x.r!=='none'&&!confirm('Xoá cả chuỗi lặp lại này?'))return;S.events=S.events.filter(z=>z.id!==evId);save();$('#evdlg').close();evRefresh()};
@@ -1208,7 +1217,7 @@ function syncPc(){const r=pcRange(),en=S.lang==='en';
   $('#pcInfo').textContent=t}
 function pcTab(k){$('#pcNeu').hidden=k!=='neu';$('#pcUet').hidden=k!=='uet';$$('#pcTab button').forEach(b=>b.classList.toggle('on',b.dataset.k===k))}
 function pcAuto(){const r=pcRange();pcTab(r&&r.u!==undefined?'uet':'neu')}
-function pcSet(a,b){$('#evS').value=a;$('#evE').value=b;syncPc()}
+function pcSet(a,b){$('#evAD').checked=false;$('#evS').disabled=$('#evE').disabled=false;$('#evS').value=a;$('#evE').value=b;syncPc()}
 $('#pcBox').onclick=e=>{const b=e.target.closest('button');if(!b)return;
   if(b.dataset.k){pcTab(b.dataset.k);return}
   if(b.dataset.uc!==undefined){const k=+b.dataset.uc,r=pcRange();if(r&&r.u===2*k&&r.v===2*k+1)pcSet('','');else pcSet(UP[2*k][0],UP[2*k+1][1]);return}
@@ -1674,7 +1683,7 @@ RX.push(
  [/(\d+) mìn/g,'$1 mines'],[/^Dễ ·/,'Easy ·'],[/^Vừa ·/,'Medium ·'],[/^Khó \(Expert\)/,'Hard (Expert)'],[/^Siêu khó ·/,'Insane ·'],
  [/rất khó/g,'very hard'],[/chuẩn/g,'standard'],[/rất dễ/g,'very easy'],[/· dễ$/,'· easy']);
 try{[["Mũ chóp", "Top hat"], ["Vương miện", "Crown"], ["Mũ tốt nghiệp", "Graduation cap"], ["Mũ lưỡi trai", "Cap"], ["Mũ rộng vành", "Wide-brim hat"], ["Mũ cứu hộ", "Hard hat"], ["Mũ lính", "Soldier helmet"], ["Nơ", "Bow"], ["Hoa anh đào", "Cherry blossom"], ["Hoa hướng dương", "Sunflower"], ["Mũ Noel", "Santa hat"], ["Mũ nấm", "Mushroom hat"], ["Bóng bay", "Balloon"], ["Gà con", "Chick"], ["Cầu vồng", "Rainbow"], ["Ngôi sao", "Star"], ["Kính râm", "Sunglasses"], ["Kính cận", "Glasses"], ["Kính bơi", "Goggles"], ["Kính mũi râu", "Disguise glasses"], ["Kính lúp", "Magnifier"], ["Khăn len", "Scarf"], ["Huy chương", "Medal"], ["Chuỗi hạt", "Beads"], ["Chuông nhỏ", "Little bell"], ["Ruy-băng", "Ribbon"], ["Huy chương vàng", "Gold medal"], ["Kim cương", "Diamond"], ["Nơ bướm", "Bow tie"], ["Bùa may mắn", "Lucky charm"], ["Cỏ bốn lá", "Four-leaf clover"], ["Áo thun", "T-shirt"], ["Sơ mi", "Shirt"], ["Áo khoác", "Jacket"], ["Áo blouse", "Lab coat"], ["Áo phản quang", "Hi-vis vest"], ["Váy", "Dress"], ["Võ phục", "Martial arts gi"], ["Áo thể thao", "Sports jersey"], ["Đồ bơi", "Swimsuit"], ["Ba lô", "Backpack"], ["Bóng đá", "Football"], ["Bóng rổ", "Basketball"], ["Gấu bông", "Teddy bear"], ["Sách", "Books"], ["Chậu cây", "Potted plant"], ["Cà phê", "Coffee"], ["Trà xanh", "Green tea"], ["Diều", "Kite"], ["Bảng màu", "Palette"], ["Tai nghe", "Headphones"], ["Đũa phép", "Magic wand"], ["Máy chơi game", "Game console"], ["Kèn", "Trumpet"], ["Ván trượt", "Skateboard"], ["Vĩ cầm", "Violin"], ["Kính thiên văn", "Telescope"], ["Cúp", "Trophy"], ["Mèo", "Cat"], ["Cún", "Dog"], ["Thỏ", "Rabbit"], ["Ếch", "Frog"], ["Cáo", "Fox"], ["Gấu nâu", "Brown bear"], ["Gấu trúc", "Panda"], ["Cánh cụt", "Penguin"], ["Sư tử", "Lion"], ["Hổ", "Tiger"], ["Kỳ lân", "Unicorn"], ["Rồng", "Dragon"], ["Cam", "Orange"], ["Nho", "Grapes"], ["Đã sở hữu", "Owned"], ["Đang chọn ✓", "Selected ✓"], ["Chọn", "Select"], ["Cởi ra", "Take off"], ["Mặc", "Wear"], ["Chưa đủ xu — học thêm một chút nhé 📚", "Not enough coins — study a bit more 📚"], ["Đói quá rồi, cho ăn đi bạn ơi! 🥺", "I'm so hungry, please feed me! 🥺"], ["Hơi đói bụng… 🍽️", "A bit hungry… 🍽️"], ["Buồn buồn, học bài để vui lên nhé 📚", "Feeling a bit sad, study to cheer me up 📚"], ["💥 Nổ mìn rồi! Thử lại nhé", "💥 Boom! Try again"], ["😵 Hết nước đi!", "😵 No moves left!"], ["🎉 Đã đạt 2048! Chơi tiếp được nhé", "🎉 You reached 2048! You can keep playing"], ["Tết Dương lịch", "New Year's Day"], ["Quốc tế Phụ nữ", "International Women's Day"], ["Giải phóng miền Nam", "Reunification Day"], ["Quốc tế Lao động", "International Labour Day"], ["Quốc tế Thiếu nhi", "Children's Day"], ["Quốc khánh", "National Day"], ["Ngày Phụ nữ Việt Nam", "Vietnamese Women's Day"], ["Ngày Nhà giáo Việt Nam", "Vietnamese Teachers' Day"], ["Giáng sinh", "Christmas"], ["Rằm tháng Giêng", "Lantern Festival"], ["Giỗ Tổ Hùng Vương", "Hung Kings' Festival"], ["Lễ Phật Đản", "Vesak"], ["Tết Đoan Ngọ", "Double Fifth Festival"], ["Lễ Vu Lan", "Vu Lan Festival"], ["Tết Trung Thu", "Mid-Autumn Festival"], ["Ông Táo chầu trời", "Kitchen Gods' Day"], ["Cắt ảnh", "Crop image"], ["Tự do", "Free"], ["Gốc", "Original"], ["Task nhỏ đã xong", "Subtask done"], ["Task nhỏ hơn đã xong", "Sub-subtask done"], ["Thêm task nhỏ hơn", "Add sub-subtask"], ["Document PiP lỗi, dùng video PiP", "Document PiP failed, using video PiP"], ["File không phải bản sao lưu của Study Hub.", "This file is not a Study Hub backup."], ["Không khôi phục được (bộ nhớ trình duyệt đầy).", "Couldn't restore (browser storage is full)."], ["Không lưu được ảnh (bộ nhớ trình duyệt/ổ đĩa đầy hoặc bị chặn). Hãy xoá bớt ảnh hoặc giải phóng dung lượng.", "Couldn't save the images (browser storage/disk is full or blocked). Delete some images or free up space."], ["Đã thêm ✓", "Added ✓"], ["Sai email hoặc mật khẩu.", "Wrong email or password."], ["Sai mật khẩu.", "Wrong password."], ["Email chưa có tài khoản.", "No account with this email."], ["Email này đã có tài khoản, hãy bấm Đăng nhập.", "This email already has an account, click Sign in."], ["Mật khẩu cần ít nhất 6 ký tự.", "Password needs at least 6 characters."], ["Email không hợp lệ.", "Invalid email."], ["Bạn đã đóng cửa sổ đăng nhập.", "You closed the sign-in window."], ["Tên miền này chưa được thêm vào Authorized domains trong Firebase.", "This domain hasn't been added to Authorized domains in Firebase."], ["Không có mạng.", "No network."], ["Thử quá nhiều lần, hãy đợi một lúc.", "Too many attempts, please wait a moment."], ["mới sửa", "edited"], ["Đang kiểm tra dữ liệu…", "Checking data…"], ["Không tải được thư viện Firebase. Hãy kiểm tra mạng và mở app qua https.", "Couldn't load the Firebase library. Check your network and open the app over https."], ["Nhập email trước rồi bấm lại.", "Enter your email first, then click again."], ["Đã gửi email đặt lại mật khẩu.", "Password reset email sent."], ["Ngoại tuyến — sẽ đồng bộ khi có mạng", "Offline — will sync when back online"], ["Đã có mạng, đang đồng bộ…", "Back online, syncing…"], ["Xoá trang này?", "Delete this page?"], ["Tài khoản này đã có dữ liệu trên đám mây.\n\nOK = dùng dữ liệu trên đám mây (dữ liệu trên máy này được lưu một bản sao lưu).\nHuỷ = giữ dữ liệu trên máy này và ghi đè lên đám mây.", "This account already has data in the cloud.\n\nOK = use the cloud data (the data on this device is saved as a backup).\nCancel = keep this device's data and overwrite the cloud."]].forEach(([a,b])=>LD.set(a,b))}catch(e){}
-LD.set('Lịch học','Class');LD.set('Tất cả','All');LD.set('+ Thêm sự kiện','+ Add event');LD.set('🗓 Thêm trong Thời khóa biểu','🗓 Add in Timetable');LD.set('Thêm lịch học (nền đặc) và sự kiện (viền nét đứt) tại đây. Cả hai vẫn hiện trong Việc & kế hoạch và lịch ở trang chủ.','Add classes (solid) and events (dashed) here. Both still show in Tasks & plan and on the home page.');LD.set('+ Mục tiêu','+ Goal');LD.set('Xén ảnh','Crop image');LD.set('Cổ','Neck');
+LD.set('Lịch học','Class');LD.set('Tất cả','All');LD.set('Đến ngày (sự kiện nhiều ngày, tuỳ chọn)','To date (multi-day event, optional)');LD.set('Ngày kết thúc phải sau ngày bắt đầu','End date must be after start date');LD.set('+ Sự kiện cả ngày','+ All-day event');LD.set('Tick “Cả ngày” nếu không có giờ cụ thể.','Tick “All day” if there is no specific time.');LD.set('+ Thêm sự kiện','+ Add event');LD.set('🗓 Thêm trong Thời khóa biểu','🗓 Add in Timetable');LD.set('Thêm lịch học (nền đặc) và sự kiện (viền nét đứt) tại đây. Cả hai vẫn hiện trong Việc & kế hoạch và lịch ở trang chủ.','Add classes (solid) and events (dashed) here. Both still show in Tasks & plan and on the home page.');LD.set('+ Mục tiêu','+ Goal');LD.set('Xén ảnh','Crop image');LD.set('Cổ','Neck');
 RX.push([/Tết Nguyên Đán \(mùng (\d)\)/g,'Lunar New Year (day $1)'],[/^Đã mua /,'Bought '],[/^Chào /,'Hi '],[/Hoàn thành/g,'Done'],[/Thắng /g,'Won '],[/kỷ lục mới/g,'new record'],[/^(Lỗi đồng bộ|Lỗi): /,'Error: '],[/^Phiên (\d)/,'Session $1'],[/Lỗi: /g,'Error: ']);
 if(S.lang==='en'){unTree(document.body);trTree(document.body)}
 
@@ -2022,7 +2031,7 @@ window.rTT=()=>{const root=$('#tkb');if(!root||root.hidden)return;
   const HH=56,H=(hi-lo)/60*HH,e=days[6];
   $('#ttLbl').textContent=days[0].getDate()+'/'+(days[0].getMonth()+1)+' – '+e.getDate()+'/'+(e.getMonth()+1);
   let h='<div></div>'+days.map((d,i)=>`<div class="tt-h ${iso(d)===td?'today':''}">${DN[i]}<small>${d.getDate()}/${d.getMonth()+1}</small></div>`).join('');
-  h+='<div class="tt-adl">Cả ngày</div>'+per.map(a=>`<div class="tt-ad">${a.filter(x=>!x.s).map(evMini).join('')}</div>`).join('');
+  h+='<div class="tt-adl">Cả ngày</div>'+per.map((a,pi)=>`<div class="tt-ad">${a.filter(x=>!x.s).map(x=>`<div class="tt-ade ${x.l?'':'o'}" data-ev="${x.id}" style="background:${x.c||'#3b6ea5'}">${esc(x.t)}${spanTag(x,iso(days[pi]))}</div>`).join('')}</div>`).join('');
   h+='<div class="tt-hr">'+[...Array((hi-lo)/60)].map((_,i)=>`<div>${pad(lo/60+i)}:00</div>`).join('')+'</div>';
   const now=new Date(),nm=now.getHours()*60+now.getMinutes();
   h+=days.map((d,i)=>{const k=iso(d);
@@ -2034,6 +2043,7 @@ window.rTT=()=>{const root=$('#tkb');if(!root||root.hidden)return;
 $('#ttG').onclick=e=>{const v=e.target.closest('[data-ev]');if(v)openEv(v.dataset.ev)};
 $('#ttPrev').onclick=()=>{off--;rTT()};$('#ttNext').onclick=()=>{off++;rTT()};$('#ttNow').onclick=()=>{off=0;rTT()};
 $('#ttAdd').onclick=()=>{const d=new Date(monday(off));const t=iso(new Date());const k=off===0?t:iso(d);openEv(null,k,true)};
+$('#ttAddA').onclick=()=>{const d=new Date(monday(off));const t=iso(new Date());const k=off===0?t:iso(d);openEv(null,k,false,true)};
 $('#ttAddE').onclick=()=>{const d=new Date(monday(off));const t=iso(new Date());const k=off===0?t:iso(d);openEv(null,k,false)};
 setInterval(()=>rTT(),60000);
 try{[['Thời khóa biểu','Timetable'],['Tài khoản & ngôn ngữ','Account & language'],['+ Thêm lịch học','+ Add class'],['Lịch học thêm tại đây (nền đặc). Sự kiện thêm ở Việc & kế hoạch cũng hiện ở đây (viền nét đứt).','Classes are added here (solid). Events added in Tasks & plan also show here (dashed outline).'],['Ca học (bấm 1 ca = cả 2 phiên)','Slot (tap one = both sessions)'],['Phiên (bấm 1 phiên, hoặc phiên đầu rồi phiên cuối)','Session (tap one, or first then last)'],['Thêm lịch học','Add class'],['Sửa lịch học','Edit class'],['🗓 Thời khóa biểu','🗓 Timetable'],['TKB','Timetable']].forEach(([a,b])=>LD.set(a,b))}catch(e){}
