@@ -471,6 +471,22 @@ textarea.tx{resize:none;overflow:hidden;display:block;width:auto;font-size:14px;
 .vcc.add{border-style:dashed;color:var(--mute)}
 #vbGrid .vbg{position:absolute;left:6px;bottom:6px;max-width:calc(100% - 44px);border:0;border-radius:99px;color:#fff;padding:2px 8px;font-size:11px;line-height:1.4;opacity:.9;cursor:pointer;-webkit-appearance:none;appearance:none;z-index:3;text-overflow:ellipsis}
 #vbGrid .vbg option{color:var(--ink);background:var(--card)}
+/* ===== điện thoại: chia trang ===== */
+#wkTabs,#fcTabs,#moreSheet{display:none}
+@media(max-width:700px){
+  #wkTabs,#fcTabs{display:flex;gap:6px;margin:0 0 12px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 50px);z-index:30;background:var(--bg);padding:6px 0}
+  #wkTabs button,#fcTabs button{flex:1;min-height:44px;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:8px 4px;font-weight:600;font-size:14px;color:var(--mute);cursor:pointer}
+  #wkTabs button.on,#fcTabs button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+  .board>.card{display:none}
+  body[data-wk=todo] .board>#todo:not(.hid),body[data-wk=plan] .board>#plan:not(.hid),body[data-wk=goalCard] .board>#goalCard:not(.hid){display:block}
+  body[data-fc=pet] #fcL,body[data-fc=timer] #fcR{display:none}
+  #moreSheet:not([hidden]){display:block;position:fixed;inset:0;z-index:2600;background:#0006}
+  #moreSheet .in{position:absolute;left:0;right:0;bottom:0;background:var(--card);border-radius:18px 18px 0 0;padding:16px 12px calc(86px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:repeat(3,1fr);gap:10px;box-shadow:0 -6px 24px #0004}
+  #moreSheet button{display:flex;flex-direction:column;align-items:center;gap:4px;min-height:76px;justify-content:center;border:1px solid var(--line);background:var(--bg);border-radius:14px;color:var(--ink);font-size:13px;cursor:pointer}
+  #moreSheet button b{font-size:26px;font-weight:400;line-height:1.1}
+  #moreSheet button.on{border-color:var(--acc);background:var(--acc2);color:var(--acc);font-weight:600}
+  #bnav button{flex:1 1 0}
+}
 /* ===== thanh trên cùng: 1 hàng, mọi mục cùng cỡ (desktop) ===== */
 @media(min-width:701px){
   header{flex-wrap:nowrap;gap:10px;padding:10px 16px;align-items:center}
@@ -511,7 +527,8 @@ textarea.tx{resize:none;overflow:hidden;display:block;width:auto;font-size:14px;
   <div class="calpop" id="calPop" hidden></div>
   <span class="row"><button class="btn ghost" id="layReset" style="display:none">Đặt lại bố cục</button><button class="btn ghost" id="layBtn">✥ Bố cục</button><button class="btn ghost" id="theme" title="Cài đặt">⚙</button></span>
 </header>
-<nav id="bnav"><button data-v="home" class="on"><b>🏠</b><span>Trang chủ</span></button><button data-v="vision"><b>🖼</b><span>Vision</span></button><button data-v="work"><b>📋</b><span>Kế hoạch</span></button><button data-v="notes"><b>✏️</b><span>Sổ tay</span></button><button data-v="focus"><b>🐾</b><span>Học</span></button><button data-v="fun"><b>🎮</b><span>Giải trí</span></button><button data-v="tkb"><b>🗓</b><span>TKB</span></button><button data-bn="cal"><b>📅</b><span>Lịch</span></button><button data-bn="set"><b>⚙</b><span>Cài đặt</span></button></nav>
+<nav id="bnav"><button data-v="home" class="on"><b>🏠</b><span>Trang chủ</span></button><button data-v="work"><b>📋</b><span>Kế hoạch</span></button><button data-v="tkb"><b>🗓</b><span>TKB</span></button><button data-v="focus"><b>🐾</b><span>Học</span></button><button data-bn="more"><b>☰</b><span>Khác</span></button></nav>
+<div id="moreSheet" hidden><div class="in"><button data-v="vision"><b>🖼</b><span>Vision board</span></button><button data-v="notes"><b>✏️</b><span>Sổ tay</span></button><button data-v="fun"><b>🎮</b><span>Giải trí</span></button><button data-bn="cal"><b>📅</b><span>Lịch</span></button><button data-bn="set"><b>⚙</b><span>Cài đặt</span></button></div></div>
 <label class="vbfab" id="vbFab" title="Thêm ảnh">＋<input type="file" id="vbFile3" accept="image/*" multiple hidden></label>
 <main id="vision" hidden><div class="card" id="vb">
   <div class="row vbbar" id="vbBar" style="margin-bottom:10px"><label class="btn" style="cursor:pointer">📷 Thêm ảnh<input type="file" id="vbFile2" accept="image/*" multiple hidden></label><button class="btn ghost" id="vbText2">✎ Thẻ chữ</button><button class="btn ghost" id="vbTidy2" title="Xếp lại gọn từ góc trên bên trái">⇲ Xếp gọn</button></div>
@@ -531,7 +548,7 @@ textarea.tx{resize:none;overflow:hidden;display:block;width:auto;font-size:14px;
       <div class="hh-ev" id="hEv"></div>
       <div class="hh-cd" id="hCd"></div>
 </div></div></main>
-<main class="lay board" id="board" hidden><div class="card" id="plan">
+<main class="lay board" id="board" hidden><div id="wkTabs"><button data-w="todo" class="on">✅ Hôm nay</button><button data-w="plan">🗂 Kế hoạch</button><button data-w="goalCard">🎯 Mục tiêu</button></div><div class="card" id="plan">
   <div class="phead">
     <h2>planner<i>.</i></h2>
     <div class="row"><span class="plab" style="margin:0">Đang lên kế hoạch</span><button class="btn ghost" id="pPrev">‹</button><b id="pLabel" style="text-align:center;min-width:110px"></b><button class="btn ghost" id="pNext">›</button><button class="btn ghost" id="pNow">Tuần này</button></div>
@@ -583,7 +600,7 @@ textarea.tx{resize:none;overflow:hidden;display:block;width:auto;font-size:14px;
     <div class="ntw" id="ntW"><div id="ntS"><div id="ntP"><canvas id="ntC"></canvas><div id="ntT"></div></div></div></div>
   </section>
 </div></main>
-<main id="focus" hidden><div class="fc">
+<main id="focus" hidden><div id="fcTabs"><button data-f="timer" class="on">⏱ Hẹn giờ</button><button data-f="pet">🐾 Thú cưng</button></div><div class="fc">
   <div id="fcL"><div class="card timer" id="timer">
   <div class="seg" id="mode"><button data-m="pomo" class="on">Pomodoro</button><button data-m="sw">Bấm giờ</button></div>
   <div class="chips" id="chips"></div>
@@ -616,7 +633,7 @@ textarea.tx{resize:none;overflow:hidden;display:block;width:auto;font-size:14px;
   </details>
   <p class="mute" id="pInfo">Phiên tập trung hôm nay: <b id="pCnt">0</b></p>
 </div></div>
-  <div>
+  <div id="fcR">
     <div class="card"><div class="row" style="margin-bottom:8px"><input id="pNm" class="grow" style="font-weight:700" maxlength="16"><span class="coin">🪙 <span id="pCoin">0</span></span></div>
       <div class="stg" id="pStg"><div class="pw" id="pW"><span class="pe" id="pE"></span><span class="po b" id="oB"></span><span class="po n" id="oN"></span><span class="po e" id="oE"></span><span class="po h" id="oH"></span><span class="po s" id="oS"></span></div></div>
       <div class="mute" id="pSt" style="margin:8px 0 2px"></div>
@@ -1274,7 +1291,7 @@ $('#calPop').onclick=e=>{e.stopPropagation();const ve=e.target.closest('[data-ev
   if(b.dataset.cm){cM.setMonth(cM.getMonth()+ +b.dataset.cm);rCal();return}
   if(b.dataset.cd){tDay=b.dataset.cd;const d=new Date(tDay+'T00:00');cM=new Date(d.getFullYear(),d.getMonth(),1);
     wOff=Math.round((monday(0)-(()=>{const x=new Date(d);x.setDate(d.getDate()-((d.getDay()+6)%7));return x})())/-6048e5);
-    rPlan();rCal();showView('work')}};
+    rPlan();rCal();setWk('todo');showView('work')}};
 document.addEventListener('click',()=>{$('#calPop').hidden=true});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#calPop').hidden=true});
 // PICTURE-IN-PICTURE (bong bóng)
@@ -1510,17 +1527,25 @@ sndUI();
 
 // ===== 2 mục: Trang chủ (vision board) / Việc & kế hoạch =====
 function showView(v){document.body.dataset.view=v;$('#home').hidden=v!=='home';$('#vision').hidden=v!=='vision';$('#board').hidden=v!=='work';$('#notes').hidden=v!=='notes';$('#focus').hidden=v!=='focus';$('#fun').hidden=v!=='fun';$('#tkb').hidden=v!=='tkb';
-  $$('#nav button,#bnav button[data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===v));window.scrollTo(0,0);
+  $$('#nav button,#bnav button[data-v],#moreSheet button[data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  $('#bnav [data-bn=more]').classList.toggle('on',!document.querySelector('#bnav button[data-v="'+v+'"]'));$('#moreSheet').hidden=true;window.scrollTo(0,0);
   if(v==='vision')requestAnimationFrame(()=>vbNorm(true));else if(v==='work')applyAll();else if(v==='notes')window.notesShow&&notesShow();else if(v==='focus')window.petShow&&petShow();else if(v==='fun')window.funShow&&funShow();else if(v==='tkb')window.rTT&&rTT();else requestAnimationFrame(hmBuild)}
 $('#nav').onclick=e=>{const b=e.target.closest('button');if(b)showView(b.dataset.v)};
-$('#bnav').onclick=e=>{e.stopPropagation();const b=e.target.closest('button');if(!b)return;
+function bnGo(e){e.stopPropagation();const b=e.target.closest('button');if(!b){$('#moreSheet').hidden=true;return}
   if(b.dataset.v)return showView(b.dataset.v);
-  if(b.dataset.bn==='cal')$('#calBtn').click();else if(b.dataset.bn==='set')$('#theme').click()};
-$('#hTm').onclick=()=>showView('focus');
+  const k=b.dataset.bn;if(k==='more'){$('#moreSheet').hidden=!$('#moreSheet').hidden;return}
+  $('#moreSheet').hidden=true;if(k==='cal')$('#calBtn').click();else if(k==='set')$('#theme').click()}
+$('#bnav').onclick=bnGo;$('#moreSheet').onclick=e=>{if(e.target===$('#moreSheet'))bnGo(e);else bnGo(e)};
+function setWk(w){document.body.dataset.wk=w;$$('#wkTabs button').forEach(b=>b.classList.toggle('on',b.dataset.w===w))}
+function setFc(f){document.body.dataset.fc=f;$$('#fcTabs button').forEach(b=>b.classList.toggle('on',b.dataset.f===f))}
+$('#wkTabs').onclick=e=>{const b=e.target.closest('button');if(b){setWk(b.dataset.w);window.scrollTo(0,0)}};
+$('#fcTabs').onclick=e=>{const b=e.target.closest('button');if(b){setFc(b.dataset.f);window.scrollTo(0,0)}};
+setWk('todo');setFc('timer');
+$('#hTm').onclick=()=>{setFc('timer');showView('focus')};
 $('#qOpen').onclick=()=>{$('#set').close();$('#qdlg').showModal()};
 $('#qX').onclick=()=>$('#qdlg').close();
 $('#hQuote').onclick=()=>$('#qNext').click();
-$('#hCd').onclick=e=>{if(e.target.closest('[data-go]')){showView('work');setTimeout(()=>$('#gIn').focus(),80)}};
+$('#hCd').onclick=e=>{if(e.target.closest('[data-go]')){setWk('goalCard');showView('work');setTimeout(()=>$('#gIn').focus(),80)}};
 new ResizeObserver(()=>{clearTimeout(window._hr);window._hr=setTimeout(()=>vbNorm(true),60)}).observe($('#vbHero'));
 
 // ===== Trang chủ: giờ ở giữa, ảnh xáo ngẫu nhiên xung quanh, tự đổi dần =====
@@ -1684,7 +1709,7 @@ RX.push(
  [/(\d+) mìn/g,'$1 mines'],[/^Dễ ·/,'Easy ·'],[/^Vừa ·/,'Medium ·'],[/^Khó \(Expert\)/,'Hard (Expert)'],[/^Siêu khó ·/,'Insane ·'],
  [/rất khó/g,'very hard'],[/chuẩn/g,'standard'],[/rất dễ/g,'very easy'],[/· dễ$/,'· easy']);
 try{[["Mũ chóp", "Top hat"], ["Vương miện", "Crown"], ["Mũ tốt nghiệp", "Graduation cap"], ["Mũ lưỡi trai", "Cap"], ["Mũ rộng vành", "Wide-brim hat"], ["Mũ cứu hộ", "Hard hat"], ["Mũ lính", "Soldier helmet"], ["Nơ", "Bow"], ["Hoa anh đào", "Cherry blossom"], ["Hoa hướng dương", "Sunflower"], ["Mũ Noel", "Santa hat"], ["Mũ nấm", "Mushroom hat"], ["Bóng bay", "Balloon"], ["Gà con", "Chick"], ["Cầu vồng", "Rainbow"], ["Ngôi sao", "Star"], ["Kính râm", "Sunglasses"], ["Kính cận", "Glasses"], ["Kính bơi", "Goggles"], ["Kính mũi râu", "Disguise glasses"], ["Kính lúp", "Magnifier"], ["Khăn len", "Scarf"], ["Huy chương", "Medal"], ["Chuỗi hạt", "Beads"], ["Chuông nhỏ", "Little bell"], ["Ruy-băng", "Ribbon"], ["Huy chương vàng", "Gold medal"], ["Kim cương", "Diamond"], ["Nơ bướm", "Bow tie"], ["Bùa may mắn", "Lucky charm"], ["Cỏ bốn lá", "Four-leaf clover"], ["Áo thun", "T-shirt"], ["Sơ mi", "Shirt"], ["Áo khoác", "Jacket"], ["Áo blouse", "Lab coat"], ["Áo phản quang", "Hi-vis vest"], ["Váy", "Dress"], ["Võ phục", "Martial arts gi"], ["Áo thể thao", "Sports jersey"], ["Đồ bơi", "Swimsuit"], ["Ba lô", "Backpack"], ["Bóng đá", "Football"], ["Bóng rổ", "Basketball"], ["Gấu bông", "Teddy bear"], ["Sách", "Books"], ["Chậu cây", "Potted plant"], ["Cà phê", "Coffee"], ["Trà xanh", "Green tea"], ["Diều", "Kite"], ["Bảng màu", "Palette"], ["Tai nghe", "Headphones"], ["Đũa phép", "Magic wand"], ["Máy chơi game", "Game console"], ["Kèn", "Trumpet"], ["Ván trượt", "Skateboard"], ["Vĩ cầm", "Violin"], ["Kính thiên văn", "Telescope"], ["Cúp", "Trophy"], ["Mèo", "Cat"], ["Cún", "Dog"], ["Thỏ", "Rabbit"], ["Ếch", "Frog"], ["Cáo", "Fox"], ["Gấu nâu", "Brown bear"], ["Gấu trúc", "Panda"], ["Cánh cụt", "Penguin"], ["Sư tử", "Lion"], ["Hổ", "Tiger"], ["Kỳ lân", "Unicorn"], ["Rồng", "Dragon"], ["Cam", "Orange"], ["Nho", "Grapes"], ["Đã sở hữu", "Owned"], ["Đang chọn ✓", "Selected ✓"], ["Chọn", "Select"], ["Cởi ra", "Take off"], ["Mặc", "Wear"], ["Chưa đủ xu — học thêm một chút nhé 📚", "Not enough coins — study a bit more 📚"], ["Đói quá rồi, cho ăn đi bạn ơi! 🥺", "I'm so hungry, please feed me! 🥺"], ["Hơi đói bụng… 🍽️", "A bit hungry… 🍽️"], ["Buồn buồn, học bài để vui lên nhé 📚", "Feeling a bit sad, study to cheer me up 📚"], ["💥 Nổ mìn rồi! Thử lại nhé", "💥 Boom! Try again"], ["😵 Hết nước đi!", "😵 No moves left!"], ["🎉 Đã đạt 2048! Chơi tiếp được nhé", "🎉 You reached 2048! You can keep playing"], ["Tết Dương lịch", "New Year's Day"], ["Quốc tế Phụ nữ", "International Women's Day"], ["Giải phóng miền Nam", "Reunification Day"], ["Quốc tế Lao động", "International Labour Day"], ["Quốc tế Thiếu nhi", "Children's Day"], ["Quốc khánh", "National Day"], ["Ngày Phụ nữ Việt Nam", "Vietnamese Women's Day"], ["Ngày Nhà giáo Việt Nam", "Vietnamese Teachers' Day"], ["Giáng sinh", "Christmas"], ["Rằm tháng Giêng", "Lantern Festival"], ["Giỗ Tổ Hùng Vương", "Hung Kings' Festival"], ["Lễ Phật Đản", "Vesak"], ["Tết Đoan Ngọ", "Double Fifth Festival"], ["Lễ Vu Lan", "Vu Lan Festival"], ["Tết Trung Thu", "Mid-Autumn Festival"], ["Ông Táo chầu trời", "Kitchen Gods' Day"], ["Cắt ảnh", "Crop image"], ["Tự do", "Free"], ["Gốc", "Original"], ["Task nhỏ đã xong", "Subtask done"], ["Task nhỏ hơn đã xong", "Sub-subtask done"], ["Thêm task nhỏ hơn", "Add sub-subtask"], ["Document PiP lỗi, dùng video PiP", "Document PiP failed, using video PiP"], ["File không phải bản sao lưu của Study Hub.", "This file is not a Study Hub backup."], ["Không khôi phục được (bộ nhớ trình duyệt đầy).", "Couldn't restore (browser storage is full)."], ["Không lưu được ảnh (bộ nhớ trình duyệt/ổ đĩa đầy hoặc bị chặn). Hãy xoá bớt ảnh hoặc giải phóng dung lượng.", "Couldn't save the images (browser storage/disk is full or blocked). Delete some images or free up space."], ["Đã thêm ✓", "Added ✓"], ["Sai email hoặc mật khẩu.", "Wrong email or password."], ["Sai mật khẩu.", "Wrong password."], ["Email chưa có tài khoản.", "No account with this email."], ["Email này đã có tài khoản, hãy bấm Đăng nhập.", "This email already has an account, click Sign in."], ["Mật khẩu cần ít nhất 6 ký tự.", "Password needs at least 6 characters."], ["Email không hợp lệ.", "Invalid email."], ["Bạn đã đóng cửa sổ đăng nhập.", "You closed the sign-in window."], ["Tên miền này chưa được thêm vào Authorized domains trong Firebase.", "This domain hasn't been added to Authorized domains in Firebase."], ["Không có mạng.", "No network."], ["Thử quá nhiều lần, hãy đợi một lúc.", "Too many attempts, please wait a moment."], ["mới sửa", "edited"], ["Đang kiểm tra dữ liệu…", "Checking data…"], ["Không tải được thư viện Firebase. Hãy kiểm tra mạng và mở app qua https.", "Couldn't load the Firebase library. Check your network and open the app over https."], ["Nhập email trước rồi bấm lại.", "Enter your email first, then click again."], ["Đã gửi email đặt lại mật khẩu.", "Password reset email sent."], ["Ngoại tuyến — sẽ đồng bộ khi có mạng", "Offline — will sync when back online"], ["Đã có mạng, đang đồng bộ…", "Back online, syncing…"], ["Xoá trang này?", "Delete this page?"], ["Tài khoản này đã có dữ liệu trên đám mây.\n\nOK = dùng dữ liệu trên đám mây (dữ liệu trên máy này được lưu một bản sao lưu).\nHuỷ = giữ dữ liệu trên máy này và ghi đè lên đám mây.", "This account already has data in the cloud.\n\nOK = use the cloud data (the data on this device is saved as a backup).\nCancel = keep this device's data and overwrite the cloud."]].forEach(([a,b])=>LD.set(a,b))}catch(e){}
-LD.set('Lịch học','Class');LD.set('Tất cả','All');LD.set('Đến ngày (sự kiện nhiều ngày, tuỳ chọn)','To date (multi-day event, optional)');LD.set('Ngày kết thúc phải sau ngày bắt đầu','End date must be after start date');LD.set('+ Sự kiện cả ngày','+ All-day event');LD.set('Tick “Cả ngày” nếu không có giờ cụ thể.','Tick “All day” if there is no specific time.');LD.set('+ Thêm sự kiện','+ Add event');LD.set('🗓 Thêm trong Thời khóa biểu','🗓 Add in Timetable');LD.set('Thêm lịch học (nền đặc) và sự kiện (viền nét đứt) tại đây. Cả hai vẫn hiện trong Việc & kế hoạch và lịch ở trang chủ.','Add classes (solid) and events (dashed) here. Both still show in Tasks & plan and on the home page.');LD.set('+ Mục tiêu','+ Goal');LD.set('Xén ảnh','Crop image');LD.set('Cổ','Neck');
+LD.set('Lịch học','Class');LD.set('Tất cả','All');[['✅ Hôm nay','✅ Today'],['🗂 Kế hoạch','🗂 Plan'],['🎯 Mục tiêu','🎯 Goals'],['⏱ Hẹn giờ','⏱ Timer'],['🐾 Thú cưng','🐾 Pet'],['Khác','More']].forEach(([a,b])=>LD.set(a,b));LD.set('Đến ngày (sự kiện nhiều ngày, tuỳ chọn)','To date (multi-day event, optional)');LD.set('Ngày kết thúc phải sau ngày bắt đầu','End date must be after start date');LD.set('+ Sự kiện cả ngày','+ All-day event');LD.set('Tick “Cả ngày” nếu không có giờ cụ thể.','Tick “All day” if there is no specific time.');LD.set('+ Thêm sự kiện','+ Add event');LD.set('🗓 Thêm trong Thời khóa biểu','🗓 Add in Timetable');LD.set('Thêm lịch học (nền đặc) và sự kiện (viền nét đứt) tại đây. Cả hai vẫn hiện trong Việc & kế hoạch và lịch ở trang chủ.','Add classes (solid) and events (dashed) here. Both still show in Tasks & plan and on the home page.');LD.set('+ Mục tiêu','+ Goal');LD.set('Xén ảnh','Crop image');LD.set('Cổ','Neck');
 RX.push([/Tết Nguyên Đán \(mùng (\d)\)/g,'Lunar New Year (day $1)'],[/^Đã mua /,'Bought '],[/^Chào /,'Hi '],[/Hoàn thành/g,'Done'],[/Thắng /g,'Won '],[/kỷ lục mới/g,'new record'],[/^(Lỗi đồng bộ|Lỗi): /,'Error: '],[/^Phiên (\d)/,'Session $1'],[/Lỗi: /g,'Error: ']);
 if(S.lang==='en'){unTree(document.body);trTree(document.body)}
 
@@ -1915,7 +1940,7 @@ $('#shG').onclick=e=>{const b=e.target.closest('button');if(!b)return;const p=P(
   save();render()};
 $('#pStg').onclick=()=>{fx('❤️');need(0,1);$('#pW').classList.remove('jmp');void $('#pW').offsetWidth;$('#pW').classList.add('jmp');bars()};
 $('#pNm').onchange=e=>{P().nm=e.target.value.trim()||'Bông';save()};
-$('#hCoinB').onclick=()=>showView('focus');
+$('#hCoinB').onclick=()=>{setFc('pet');showView('focus')};
 setInterval(()=>{if(document.body.dataset.view==='focus')bars()},30000);
 window.petShow=render;coin();
 })();
